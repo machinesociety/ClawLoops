@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 
+from app.schemas.runtime import WorkspaceEntryReason
+
 
 class WorkspaceEntryResponse(BaseModel):
     ready: bool
-    runtime_id: str | None = None
-    browser_url: str | None = None
-    reason: str | None = None
+    runtimeId: str | None = None
+    browserUrl: str | None = None
+    reason: WorkspaceEntryReason | None = None
 

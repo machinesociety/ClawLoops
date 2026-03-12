@@ -29,3 +29,36 @@
         标准化封装：将通用业务逻辑（如“查询 CRM”、“生成周报”、“竞品分析”）封装为标准“技能包”。  
         一键分发：管理员可将技能包一键推送至全员或特定部门，实现知识的高效复用与沉淀。  
         版本管理：支持技能包的迭代更新与回滚，确保业务逻辑的一致性。  
+
+## 项目架构
+- 统一入口：Traefik，采用子域名路由，把浏览器入口和内部服务地址分开管理。
+- 统一认证：Authentik，平台负责会话鉴权与身份上下文注入。
+- 平台层：控制面 API + 极简 Web UI，负责用户、状态、资源真相与管理后台。
+- 运行时：每用户一个 OpenClaw runtime 容器。
+- 生命周期管理：独立 runtime manager /provisioner，负责容器创建、停止、删除、挂载与状态查询。
+- 模型网关：LiteLLM + PostgreSQL，统一接公司模型、本地模型和用户自有凭据。
+- 本地模型：vLLM 为主，Ollama 作为补充。
+- 密钥管理：MVP 使用 secret file 注入；后续可接 OpenBao。
+
+| 层级     | 核心组件                               | 职责                                                         |
+| -------- | -------------------------------------- | ------------------------------------------------------------ |
+| 入口层   | Traefik + Authentik                    | 统一外部访问、登录、会话识别与转发。                         |
+| 平台层   | CrewClaw 控制面                        | 用户同步、UserRuntimeBinding 管理、管理后台、工作台。        |
+| 编排层   | Runtime Orchestrator + Runtime Manager | 将 desiredState 落为容器实际状态。                           |
+| 运行时层 | Per-user OpenClaw runtime              | 用户自己的 workspace、state、auth profiles 与 agent runtime。 |
+| 模型层   | LiteLLM + PostgreSQL + vLLM/Ollama     | 统一模型出口、默认模型、凭据代理与 usage 归集。              |
+
+<img width="1039" height="1079" alt="image" src="https://github.com/user-attachments/assets/809b74a9-fb36-4c79-814f-5a405d5b18e0" />
+
+## 快速开始
+```markdown
+```bash
+# 1. 克隆仓库
+git clone https://github.com/your-org/crewclaw.git
+cd crewclaw
+
+# 2. 启动核心服务
+docker-compose up -d
+
+# 3. 初始化管理员账户
+./bin/crewclaw init-admin --username admin --password <your_secure_password>

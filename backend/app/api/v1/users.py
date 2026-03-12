@@ -1,17 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.schemas.runtime import (
-    UserQuotaResponse,
-    UserRuntimeBindingResponse,
-    RuntimeStatusResponse,
-)
+from app.core.dependencies import require_active_user
+from app.schemas.runtime import RuntimeStatusResponse, UserQuotaResponse, UserRuntimeBindingResponse
 
 
 router = APIRouter(tags=["users"])
 
 
 @router.get("/users/me/quota", response_model=UserQuotaResponse)
-async def get_my_quota() -> UserQuotaResponse:
+async def get_my_quota(
+    _ = Depends(require_active_user),
+) -> UserQuotaResponse:
     """
     获取当前用户 quota。
 
@@ -26,29 +25,22 @@ async def get_my_quota() -> UserQuotaResponse:
 
 
 @router.get("/users/me/runtime", response_model=UserRuntimeBindingResponse | None)
-async def get_my_runtime_binding() -> UserRuntimeBindingResponse | None:
+async def get_my_runtime_binding(
+    _ = Depends(require_active_user),
+) -> UserRuntimeBindingResponse | None:
     """
     获取当前用户 runtime binding。
 
     TODO:
     - 从 UserRuntimeBinding 仓储中读取实际数据。
     """
-    return UserRuntimeBindingResponse(
-        user_id="u_001",
-        runtime_id="rt_001",
-        volume_id="vol_001",
-        image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
-        desired_state="running",
-        observed_state="running",
-        browser_url="https://u-001.crewclaw.example.com",
-        internal_endpoint="http://crewclaw-u001:3000",
-        retention_policy="preserve_workspace",
-        last_error=None,
-    )
+    return None
 
 
 @router.get("/users/me/runtime/status", response_model=RuntimeStatusResponse)
-async def get_my_runtime_status() -> RuntimeStatusResponse:
+async def get_my_runtime_status(
+    _ = Depends(require_active_user),
+) -> RuntimeStatusResponse:
     """
     查询当前用户 runtime 状态。
 
@@ -56,10 +48,12 @@ async def get_my_runtime_status() -> RuntimeStatusResponse:
     - 从 RuntimeTask 和 UserRuntimeBinding 综合得出状态。
     """
     return RuntimeStatusResponse(
-        runtime_id="rt_001",
-        desired_state="running",
-        observed_state="running",
-        browser_url="https://u-001.crewclaw.example.com",
-        last_error=None,
+        runtimeId=None,
+        desiredState=None,
+        observedState=None,
+        ready=False,
+        browserUrl=None,
+        reason=None,
+        lastError=None,
     )
 

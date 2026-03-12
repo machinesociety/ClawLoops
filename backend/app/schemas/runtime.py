@@ -112,3 +112,12 @@ class RuntimeActionAcceptedResponse(BaseModel):
     status: str
 
 
+class UserQuotaResponse(BaseModel):
+    """
+    当前用户 quota 响应，占位模型。
+    """
+
+    userId: str
+    totalTokens: int
+    usedTokens: int
+

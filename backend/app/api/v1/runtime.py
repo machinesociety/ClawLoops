@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.core.dependencies import require_active_user
 from app.schemas.runtime import RuntimeActionAcceptedResponse, RuntimeTaskResponse
 
 
@@ -7,7 +8,9 @@ router = APIRouter(tags=["runtime"])
 
 
 @router.post("/users/me/runtime/start", response_model=RuntimeActionAcceptedResponse, status_code=202)
-async def start_runtime() -> RuntimeActionAcceptedResponse:
+async def start_runtime(
+    _ = Depends(require_active_user),
+) -> RuntimeActionAcceptedResponse:
     """
     启动或创建 runtime。
 
@@ -22,7 +25,9 @@ async def start_runtime() -> RuntimeActionAcceptedResponse:
 
 
 @router.post("/users/me/runtime/stop", response_model=RuntimeActionAcceptedResponse, status_code=202)
-async def stop_runtime() -> RuntimeActionAcceptedResponse:
+async def stop_runtime(
+    _ = Depends(require_active_user),
+) -> RuntimeActionAcceptedResponse:
     """
     停止 runtime。
 
@@ -37,7 +42,9 @@ async def stop_runtime() -> RuntimeActionAcceptedResponse:
 
 
 @router.delete("/users/me/runtime", response_model=RuntimeActionAcceptedResponse, status_code=202)
-async def delete_runtime() -> RuntimeActionAcceptedResponse:
+async def delete_runtime(
+    _ = Depends(require_active_user),
+) -> RuntimeActionAcceptedResponse:
     """
     删除 runtime。
 
@@ -52,7 +59,10 @@ async def delete_runtime() -> RuntimeActionAcceptedResponse:
 
 
 @router.get("/runtime/tasks/{task_id}", response_model=RuntimeTaskResponse)
-async def get_runtime_task(task_id: str) -> RuntimeTaskResponse:
+async def get_runtime_task(
+    task_id: str,
+    _ = Depends(require_active_user),
+) -> RuntimeTaskResponse:
     """
     查询 runtime 任务状态。
 

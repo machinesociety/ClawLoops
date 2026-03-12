@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class AppSettings(BaseSettings):
@@ -8,6 +8,11 @@ class AppSettings(BaseSettings):
 
     env: str = "dev"
     log_level: str = "INFO"
+
+    # Authentik / 认证相关头部配置
+    auth_header_subject: str = "X-Authentik-Subject"
+    auth_header_email: str = "X-Authentik-Email"
+    auth_header_groups: str = "X-Authentik-Groups"
 
     # 预留后续接入的外部服务配置字段
     database_url: str | None = None

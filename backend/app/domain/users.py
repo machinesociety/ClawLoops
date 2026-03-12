@@ -16,10 +16,6 @@ class UserRole(str, Enum):
 class User:
     """
     平台内部用户对象。
-
-    TODO:
-    - 补充创建时间、更新时间等审计字段。
-    - 与实际持久化层字段保持一致。
     """
 
     user_id: str

@@ -1,38 +1,33 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.schemas.auth import AuthMeResponse, AccessCheckResponse
+from app.core.auth import AuthContext
+from app.core.dependencies import get_auth_context
+from app.schemas.auth import AccessCheckResponse, AuthMeResponse
 
 
 router = APIRouter(tags=["auth"])
 
 
 @router.get("/auth/me", response_model=AuthMeResponse)
-async def get_current_user() -> AuthMeResponse:
-    """
-    获取当前登录用户。
+async def get_current_user(ctx: AuthContext = Depends(get_auth_context)) -> AuthMeResponse:
+    """获取当前登录用户，即使 disabled 也可访问。"""
 
-    TODO:
-    - 从实际鉴权上下文中获取用户信息（对接 Authentik）。
-    """
-    # 占位返回示例用户，便于前后端联调。
     return AuthMeResponse(
         authenticated=True,
-        user_id="u_001",
-        subject_id="authentik:12345",
-        tenant_id="t_default",
-        role="user",
-        is_admin=False,
-        is_disabled=False,
+        userId=ctx.userId,
+        subjectId=ctx.subjectId,
+        tenantId=ctx.tenantId,
+        role=ctx.role,
+        isAdmin=ctx.isAdmin,
+        isDisabled=ctx.isDisabled,
     )
 
 
 @router.get("/auth/access", response_model=AccessCheckResponse)
-async def check_access() -> AccessCheckResponse:
-    """
-    检查当前用户是否可访问业务。
+async def check_access(ctx: AuthContext = Depends(get_auth_context)) -> AccessCheckResponse:
+    """检查当前用户是否可访问业务。"""
 
-    TODO:
-    - 根据用户状态（active/disabled）与角色判断访问权限。
-    """
+    if ctx.isDisabled:
+        return AccessCheckResponse(allowed=False, reason="USER_DISABLED")
     return AccessCheckResponse(allowed=True, reason=None)
 

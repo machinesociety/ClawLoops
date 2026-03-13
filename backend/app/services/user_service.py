@@ -49,6 +49,28 @@ class UserService:
         self._user_repo.save(user)
         return user
 
+    def get_user_by_id(self, user_id: str) -> User | None:
+        """
+        根据 user_id 获取用户。
+        """
+
+        return self._user_repo.get_by_id(user_id)
+
+    def set_user_status(self, user_id: str, status: UserStatus) -> User:
+        """
+        更新用户状态（例如 active/disabled），并持久化。
+        """
+
+        user = self._user_repo.get_by_id(user_id)
+        if user is None:
+            from app.core.errors import UserNotFoundError
+
+            raise UserNotFoundError()
+
+        user.status = status
+        self._user_repo.save(user)
+        return user
+
     def get_runtime_binding(self, user_id: str) -> UserRuntimeBinding | None:
         return self._binding_repo.get_by_user_id(user_id)
 

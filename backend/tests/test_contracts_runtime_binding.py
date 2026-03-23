@@ -1,15 +1,18 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from app.schemas.runtime import RuntimeBindingSnapshot, RuntimeStatusResponse
 from app.schemas.workspace import WorkspaceEntryResponse
 
 
-def test_user_runtime_binding_fields_match_contract():
+@pytest.mark.parametrize("baseline_version", ["baseline-v0.3", "baseline-v0.8"])
+def test_user_runtime_binding_fields_match_contract(baseline_version: str):
     contracts_path = (
         Path(__file__).resolve().parents[2]
         / "contracts"
-        / "baseline-v0.3"
+        / baseline_version
         / "user_runtime_binding.schema.json"
     )
     schema = json.loads(contracts_path.read_text(encoding="utf-8"))
@@ -20,11 +23,12 @@ def test_user_runtime_binding_fields_match_contract():
     assert model_fields == contract_fields
 
 
-def test_runtime_status_projection_fields_match_api_boundary():
+@pytest.mark.parametrize("baseline_version", ["baseline-v0.3", "baseline-v0.8"])
+def test_runtime_status_projection_fields_match_api_boundary(baseline_version: str):
     contracts_path = (
         Path(__file__).resolve().parents[2]
         / "contracts"
-        / "baseline-v0.3"
+        / baseline_version
         / "api-boundary.json"
     )
     boundary = json.loads(contracts_path.read_text(encoding="utf-8"))

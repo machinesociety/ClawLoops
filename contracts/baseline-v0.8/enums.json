@@ -1,0 +1,28 @@
+{
+  "baselineVersion": "v0.8",
+  "frozenAt": "2026-03-23",
+  "enums": {
+    "role": ["user", "admin"],
+    "user.status": ["active", "disabled"],
+    "auth.provider": ["authentik"],
+    "auth.method": ["local_password"],
+    "runtime.desiredState": ["running", "stopped", "deleted"],
+    "runtime.observedState": ["creating", "running", "stopped", "error", "deleted"],
+    "retentionPolicy": ["preserve_workspace", "wipe_workspace"],
+    "task.action": ["ensure_running", "stop", "delete"],
+    "task.status": ["pending", "running", "succeeded", "failed", "canceled"],
+    "invitation.status": ["pending", "consumed", "revoked"],
+    "workspaceEntry.reason": [
+      "runtime_not_found",
+      "runtime_not_running",
+      "runtime_starting",
+      "runtime_error"
+    ],
+    "runtimeStatus.reason": [
+      "runtime_not_found",
+      "runtime_stopped",
+      "runtime_starting",
+      "runtime_error"
+    ]
+  }
+}

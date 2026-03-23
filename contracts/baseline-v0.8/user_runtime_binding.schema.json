@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawloops:contracts:baseline-v0.8:UserRuntimeBinding",
+  "title": "UserRuntimeBinding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "runtimeId",
+    "volumeId",
+    "imageRef",
+    "desiredState",
+    "observedState",
+    "retentionPolicy",
+    "browserUrl",
+    "internalEndpoint",
+    "lastError"
+  ],
+  "properties": {
+    "runtimeId": { "type": "string", "minLength": 1 },
+    "volumeId": { "type": "string", "minLength": 1 },
+    "imageRef": { "type": "string", "minLength": 1 },
+    "desiredState": {
+      "type": "string",
+      "enum": ["running", "stopped", "deleted"]
+    },
+    "observedState": {
+      "type": "string",
+      "enum": ["creating", "running", "stopped", "error", "deleted"]
+    },
+    "browserUrl": {
+      "type": ["string", "null"],
+      "description": "浏览器入口地址；runtime ready 前可为空"
+    },
+    "internalEndpoint": {
+      "type": ["string", "null"],
+      "description": "平台内部访问地址；创建完成前可为空；禁止对普通用户侧暴露"
+    },
+    "retentionPolicy": {
+      "type": "string",
+      "enum": ["preserve_workspace", "wipe_workspace"]
+    },
+    "lastError": {
+      "type": ["string", "null"],
+      "description": "最近一次编排失败信息"
+    }
+  }
+}

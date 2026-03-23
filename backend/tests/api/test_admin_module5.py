@@ -68,19 +68,19 @@ def _setup_admin_services():
             user_id="u_user",
             runtime_id="rt_u_user",
             volume_id="vol_u_user",
-            image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
+            image_ref="clawloops-runtime-wrapper:openclaw-1.0.0",
             desired_state=DesiredState.RUNNING,
             observed_state=ObservedState.RUNNING,
             retention_policy=RetentionPolicy.PRESERVE_WORKSPACE,
-            browser_url="https://u-user.crewclaw.example.com",
-            internal_endpoint="http://crewclaw-u-user:3000",
+            browser_url="https://u-user.clawloops.example.com",
+            internal_endpoint="http://clawloops-u-user:3000",
             last_error=None,
         )
     )
     service = UserService(
         user_repo=repo,
         binding_repo=binding_repo,
-        default_image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
+        default_image_ref="clawloops-runtime-wrapper:openclaw-1.0.0",
         default_retention_policy="preserve_workspace",
     )
     return repo, binding_repo, service
@@ -126,7 +126,7 @@ def test_admin_can_list_and_get_user_detail(client):
         assert runtime["runtimeId"] == "rt_u_user"
         assert runtime["volumeId"] == "vol_u_user"
         assert runtime["imageRef"]
-        assert runtime["internalEndpoint"] == "http://crewclaw-u-user:3000"
+        assert runtime["internalEndpoint"] == "http://clawloops-u-user:3000"
         assert runtime["retentionPolicy"] == "preserve_workspace"
     finally:
         client.app.dependency_overrides.clear()
@@ -157,7 +157,7 @@ def test_admin_update_user_status_and_disabled_affects_frontend(client):
     service = UserService(
         user_repo=repo,
         binding_repo=binding_repo,
-        default_image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
+        default_image_ref="clawloops-runtime-wrapper:openclaw-1.0.0",
         default_retention_policy="preserve_workspace",
     )
 

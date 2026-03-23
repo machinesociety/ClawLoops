@@ -26,7 +26,7 @@ class RuntimeService:
         runtime_manager: RuntimeManagerPort,
         task_repo: RuntimeTaskRepository,
         config_renderer: RuntimeConfigRenderer,
-        route_host_suffix: str = "crewclaw.example.com",
+        route_host_suffix: str = "clawloops.example.com",
     ) -> None:
         self._binding_service = binding_service
         self._model_config_service = model_config_service

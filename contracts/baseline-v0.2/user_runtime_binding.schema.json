@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "crewclaw:contracts:baseline-v0.2:UserRuntimeBinding",
+  "$id": "clawloops:contracts:baseline-v0.2:UserRuntimeBinding",
   "title": "UserRuntimeBinding",
   "type": "object",
   "additionalProperties": false,

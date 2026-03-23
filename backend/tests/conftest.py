@@ -46,7 +46,7 @@ def _make_user_service(user_repo, binding_repo):
     return UserService(
         user_repo=user_repo,
         binding_repo=binding_repo,
-        default_image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
+        default_image_ref="clawloops-runtime-wrapper:openclaw-1.0.0",
         default_retention_policy="preserve_workspace",
     )
 

@@ -14,7 +14,7 @@ class RuntimeConfigRenderer:
 
     def __init__(
         self,
-        base_dir: str = "/var/lib/crewclaw",
+        base_dir: str = "/var/lib/clawloops",
     ) -> None:
         self._base_dir = Path(base_dir)
 

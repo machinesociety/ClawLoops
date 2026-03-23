@@ -1,6 +1,6 @@
 ## 概览
 
-本文件说明如何在本地运行 CrewClaw 后端的自动化测试（`pytest`），以及如何基于《MVP 开发基线总契约》《平台设计文档》《统一总接口》执行一套端到端（E2E）验收测试。
+本文件说明如何在本地运行 ClawLoops 后端的自动化测试（`pytest`），以及如何基于《MVP 开发基线总契约》《平台设计文档》《统一总接口》执行一套端到端（E2E）验收测试。
 
 目录结构（后端部分）：
 
@@ -33,12 +33,12 @@
   ```
 
 - **数据库 / 外部服务依赖**：
-  - 默认情况下，`app.core.settings.AppSettings.database_url` 为空时，数据库回退为本地 SQLite 文件：`sqlite:///./crewclaw.db`。
+  - 默认情况下，`app.core.settings.AppSettings.database_url` 为空时，数据库回退为本地 SQLite 文件：`sqlite:///./clawloops.db`。
   - 目前 `tests/conftest.py` 使用的是内存版用户仓储和 runtime binding 仓储，大部分 API 测试不依赖真实外部数据库/服务即可运行。
   - 若后续引入真实 DB 或外部服务，可以通过环境变量覆盖：
-    - `CREWCLAW_DATABASE_URL`
-    - `CREWCLAW_RUNTIME_MANAGER_BASE_URL`
-    - `CREWCLAW_MODEL_GATEWAY_BASE_URL`
+    - `CLAWLOOPS_DATABASE_URL`
+    - `CLAWLOOPS_RUNTIME_MANAGER_BASE_URL`
+    - `CLAWLOOPS_MODEL_GATEWAY_BASE_URL`
 
 ### 2. 一次性跑完所有后端测试
 
@@ -91,10 +91,10 @@ pytest
   - 确保在 `backend/` 目录内执行 `pytest`，并且已经使用 `pip install -e .` 安装了本地包。
 
 - **问题：SQLite 文件/权限问题**
-  - 默认 SQLite 文件为 `backend/crewclaw.db`，确认当前用户对该目录有读写权限，必要时删除旧文件重新生成。
+  - 默认 SQLite 文件为 `backend/clawloops.db`，确认当前用户对该目录有读写权限，必要时删除旧文件重新生成。
 
 - **问题：环境变量缺失**
-  - 如果未来某些测试依赖外部服务 URL，可通过设置 `CREWCLAW_*` 环境变量来覆盖默认配置。
+  - 如果未来某些测试依赖外部服务 URL，可通过设置 `CLAWLOOPS_*` 环境变量来覆盖默认配置。
 
 ---
 

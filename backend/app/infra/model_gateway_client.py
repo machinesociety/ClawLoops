@@ -1,5 +1,5 @@
 """
-与 LiteLLM / CrewClaw 模型网关交互的客户端占位。
+与 LiteLLM / ClawLoops 模型网关交互的客户端占位。
 
 TODO:
 - 根据实际接口获取用户可用模型与 gateway-config。

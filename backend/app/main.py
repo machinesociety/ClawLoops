@@ -16,21 +16,21 @@ from app.core.settings import get_settings
 
 def create_app() -> FastAPI:
     """
-    创建 CrewClaw 控制面 FastAPI 应用实例。
+    创建 ClawLoops 控制面 FastAPI 应用实例。
     """
     settings = get_settings()
     setup_logging(settings)
 
     app = FastAPI(
-        title="CrewClaw Control Plane",
+        title="ClawLoops Control Plane",
         version="0.1.0",
-        description="CrewClaw 平台 MVP 控制面 API 服务。",
+        description="ClawLoops 平台 MVP 控制面 API 服务。",
     )
 
     # 健康检查与根路径
     @app.get("/", tags=["meta"])
     async def root() -> dict:
-        return {"service": "crewclaw-control-plane", "status": "ok"}
+        return {"service": "clawloops-control-plane", "status": "ok"}
 
     @app.get("/healthz", tags=["meta"])
     async def healthz() -> dict:

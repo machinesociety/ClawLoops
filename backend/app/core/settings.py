@@ -20,7 +20,7 @@ class AppSettings(BaseSettings):
     model_gateway_base_url: str | None = None
 
     class Config:
-        env_prefix = "CREWCLAW_"
+        env_prefix = "CLAWLOOPS_"
         case_sensitive = False
 
 

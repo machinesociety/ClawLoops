@@ -5,7 +5,7 @@ def test_root_ok(client):
     resp = client.get("/")
     assert resp.status_code == status.HTTP_200_OK
     data = resp.json()
-    assert data["service"] == "crewclaw-control-plane"
+    assert data["service"] == "clawloops-control-plane"
 
 
 def test_healthz_ok(client):

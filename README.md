@@ -1,14 +1,14 @@
-# CrewClaw
+# ClawLoops
 
 > 🧠 The Control Plane for Team-based OpenClaw Workspaces
 
-CrewClaw is an open-source platform that enables teams to **securely provision, manage, and scale OpenClaw workspaces per user**, with a clean separation between control plane, runtime orchestration, and runtime environments.
+ClawLoops is an open-source platform that enables teams to **securely provision, manage, and scale OpenClaw workspaces per user**, with a clean separation between control plane, runtime orchestration, and runtime environments.
 
 Built for teams—not just individuals.
 
 ---
 
-## ✨ Why CrewClaw?
+## ✨ Why ClawLoops?
 
 OpenClaw is powerful, but running it for a **team** introduces real challenges:
 
@@ -18,13 +18,13 @@ OpenClaw is powerful, but running it for a **team** introduces real challenges:
 * How do you securely expose runtime UIs?
 * How do you scale runtime lifecycle (start/stop/recover)?
 
-CrewClaw solves all of this.
+ClawLoops solves all of this.
 
 ---
 
 ## 🧩 Architecture Overview
 
-CrewClaw follows a **boundary-first architecture**: browser ingress, identity, control plane, runtime orchestration, per-user runtimes, and a unified model layer are kept distinct.
+ClawLoops follows a **boundary-first architecture**: browser ingress, identity, control plane, runtime orchestration, per-user runtimes, and a unified model layer are kept distinct.
 
 At a high level:
 
@@ -32,7 +32,7 @@ At a high level:
 Browser
   |
   v
-Traefik -> Authentik -> CrewClaw Control Plane -> Runtime Orchestrator -> Runtime Manager -> Per-user OpenClaw Runtime
+Traefik -> Authentik -> ClawLoops Control Plane -> Runtime Orchestrator -> Runtime Manager -> Per-user OpenClaw Runtime
                                       |
                                       +-> Model Service / Credential Proxy -> LiteLLM -> vLLM / Ollama / upstream providers
                                       |
@@ -44,7 +44,7 @@ Traefik -> Authentik -> CrewClaw Control Plane -> Runtime Orchestrator -> Runtim
 | Layer | Components | Role |
 | ----- | ---------- | ---- |
 | Entry | Traefik + Authentik | Routing, login, session verification, subdomain protection |
-| Platform | CrewClaw control plane + web UI | User sync, runtime truth, admin governance, workspace entry |
+| Platform | ClawLoops control plane + web UI | User sync, runtime truth, admin governance, workspace entry |
 | Orchestration | Runtime orchestrator + runtime manager | Desired-state reconciliation, config rendering, container lifecycle |
 | Runtime | Per-user OpenClaw runtime | User workspace, profiles, agent runtime |
 | Model | LiteLLM + PostgreSQL + vLLM/Ollama | Unified model access, credential proxying, usage aggregation |
@@ -53,7 +53,7 @@ Traefik -> Authentik -> CrewClaw Control Plane -> Runtime Orchestrator -> Runtim
 
 For the full picture, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### 1. Control Plane (CrewClaw)
+### 1. Control Plane (ClawLoops)
 
 * User / Workspace / Role management
 * Invitation system
@@ -75,7 +75,7 @@ For the full picture, see [ARCHITECTURE.md](ARCHITECTURE.md).
 * Browser-accessible UI
 
 ```
-User → CrewClaw → RuntimeManager → Runtime (OpenClaw)
+User → ClawLoops → RuntimeManager → Runtime (OpenClaw)
 ```
 
 ---
@@ -116,7 +116,7 @@ User → CrewClaw → RuntimeManager → Runtime (OpenClaw)
 
 This project is composed of multiple repos:
 
-### 🧠 crewclaw (this repo)
+### 🧠 clawloops (this repo)
 
 > The control plane
 
@@ -132,7 +132,7 @@ This project is composed of multiple repos:
 > Runtime orchestration engine
 
 * Handles runtime creation and lifecycle
-* Reports runtime status back to CrewClaw
+* Reports runtime status back to ClawLoops
 * Can run standalone or via Docker
 
 ---
@@ -142,7 +142,7 @@ This project is composed of multiple repos:
 > Reference runtime image
 
 * Standard OpenClaw runtime environment
-* Preconfigured for CrewClaw integration
+* Preconfigured for ClawLoops integration
 
 ---
 
@@ -169,7 +169,7 @@ This project is composed of multiple repos:
 ### Run (conceptual)
 
 ```bash
-# 1. Start CrewClaw
+# 1. Start ClawLoops
 # 2. Start RuntimeManager
 # 3. Deploy openclaw runtime image
 ```
@@ -281,7 +281,7 @@ See the [LICENSE](LICENSE) file in this repository. A copy of the license is als
 
 ## 🔥 Vision
 
-CrewClaw aims to become the **standard control plane for team-based AI workspaces**, starting with OpenClaw.
+ClawLoops aims to become the **standard control plane for team-based AI workspaces**, starting with OpenClaw.
 
 We are not just building a tool.
 

@@ -90,12 +90,12 @@ def test_governance_smoke_admin_disable_user_stops_runtime_and_frontend_403(clie
             user_id="u_biz",
             runtime_id="rt_u_biz",
             volume_id="vol_u_biz",
-            image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
+            image_ref="clawloops-runtime-wrapper:openclaw-1.0.0",
             desired_state=DesiredState.RUNNING,
             observed_state=ObservedState.RUNNING,
             retention_policy=RetentionPolicy.PRESERVE_WORKSPACE,
-            browser_url="https://u-biz.crewclaw.example.com",
-            internal_endpoint="http://crewclaw-u-biz:3000",
+            browser_url="https://u-biz.clawloops.example.com",
+            internal_endpoint="http://clawloops-u-biz:3000",
             last_error=None,
         )
     )
@@ -103,7 +103,7 @@ def test_governance_smoke_admin_disable_user_stops_runtime_and_frontend_403(clie
     user_service = UserService(
         user_repo=user_repo,
         binding_repo=binding_repo,
-        default_image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
+        default_image_ref="clawloops-runtime-wrapper:openclaw-1.0.0",
         default_retention_policy="preserve_workspace",
     )
 

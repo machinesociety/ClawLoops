@@ -20,7 +20,7 @@ def test_get_or_create_user_idempotent():
     service = UserService(
         user_repo=user_repo,
         binding_repo=binding_repo,
-        default_image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
+        default_image_ref="clawloops-runtime-wrapper:openclaw-1.0.0",
         default_retention_policy="preserve_workspace",
     )
 
@@ -41,7 +41,7 @@ def test_ensure_runtime_binding_first_and_idempotent():
     service = UserService(
         user_repo=user_repo,
         binding_repo=binding_repo,
-        default_image_ref="crewclaw-runtime-wrapper:openclaw-1.0.0",
+        default_image_ref="clawloops-runtime-wrapper:openclaw-1.0.0",
         default_retention_policy="preserve_workspace",
     )
 
@@ -60,7 +60,7 @@ def test_ensure_runtime_binding_first_and_idempotent():
     assert b1.user_id == user_id
     assert b1.runtime_id.startswith("rt_")
     assert b1.volume_id.startswith("vol_")
-    assert b1.image_ref == "crewclaw-runtime-wrapper:openclaw-1.0.0"
+    assert b1.image_ref == "clawloops-runtime-wrapper:openclaw-1.0.0"
     assert b1.desired_state == DesiredState.STOPPED
     assert b1.observed_state == ObservedState.STOPPED
     assert b1.retention_policy == RetentionPolicy.PRESERVE_WORKSPACE

@@ -74,8 +74,8 @@ def test_workspace_entry_not_running_and_ready(client_with_inmemory):
         json={
             "desiredState": DomainDesiredState.RUNNING.value,
             "observedState": DomainObservedState.RUNNING.value,
-            "browserUrl": "https://u-001.crewclaw.example.com",
-            "internalEndpoint": "http://crewclaw-u001:3000",
+            "browserUrl": "https://u-001.clawloops.example.com",
+            "internalEndpoint": "http://clawloops-u001:3000",
             "lastError": None,
         },
     )
@@ -86,7 +86,7 @@ def test_workspace_entry_not_running_and_ready(client_with_inmemory):
     data_ready = resp_ready.json()
     assert data_ready["ready"] is True
     assert data_ready["runtimeId"] == runtime_id
-    assert data_ready["browserUrl"] == "https://u-001.crewclaw.example.com"
+    assert data_ready["browserUrl"] == "https://u-001.clawloops.example.com"
     assert data_ready["reason"] is None
 
 

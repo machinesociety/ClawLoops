@@ -22,7 +22,7 @@ class RuntimeManagerClient:
         return {
             "runtimeId": "rt_001",
             "observedState": "creating",
-            "internalEndpoint": "http://crewclaw-u001:3000",
+            "internalEndpoint": "http://clawloops-u001:3000",
             "message": "creating",
         }
 

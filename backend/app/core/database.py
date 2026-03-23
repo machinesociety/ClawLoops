@@ -22,7 +22,7 @@ def _build_database_url(settings: AppSettings) -> str:
         return settings.database_url
 
     # 默认使用本地 SQLite 文件，避免额外依赖。
-    return "sqlite:///./crewclaw.db"
+    return "sqlite:///./clawloops.db"
 
 
 def create_engine_from_settings(settings: AppSettings | None = None):

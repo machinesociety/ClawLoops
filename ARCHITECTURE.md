@@ -7,13 +7,13 @@ OpenClaw is a self-hosted team platform for running OpenClaw with multi-user acc
 
 ## System overview
 
-At a high level, CrewClaw separates browser access, platform control, runtime orchestration, and model access.
+At a high level, ClawLoops separates browser access, platform control, runtime orchestration, and model access.
 
 ```text
 Browser
   |
   v
-Traefik -> Authentik -> CrewClaw Control Plane -> Runtime Orchestrator -> Runtime Manager -> Per-user OpenClaw Runtime
+Traefik -> Authentik -> ClawLoops Control Plane -> Runtime Orchestrator -> Runtime Manager -> Per-user OpenClaw Runtime
                                       |
                                       +-> Model Service / Credential Proxy -> LiteLLM -> vLLM / Ollama / upstream providers
                                       |
@@ -25,7 +25,7 @@ Traefik -> Authentik -> CrewClaw Control Plane -> Runtime Orchestrator -> Runtim
 | Layer               | Components                              | Responsibilities                                             |
 | ------------------- | --------------------------------------- | ------------------------------------------------------------ |
 | Entry layer         | Traefik + Authentik                     | External routing, login, session verification, subdomain protection |
-| Platform layer      | CrewClaw control plane + minimal web UI | User sync, runtime truth, admin governance, workspace entry  |
+| Platform layer      | ClawLoops control plane + minimal web UI | User sync, runtime truth, admin governance, workspace entry  |
 | Orchestration layer | Runtime orchestrator + runtime manager  | Desired state reconciliation, config rendering, container lifecycle |
 | Runtime layer       | Per-user OpenClaw runtime               | User workspace, local profiles, state, agent runtime         |
 | Model layer         | LiteLLM + PostgreSQL + vLLM/Ollama      | Unified model access, default models, credential proxying, usage aggregation |
@@ -38,11 +38,11 @@ In MVP, each user can have at most one runtime. This keeps lifecycle management,
 
 ### Container-level isolation, not a hardened sandbox
 
-CrewClaw uses one runtime container per user. This is a practical isolation boundary for MVP, but it should not be described as a hardened security sandbox.
+ClawLoops uses one runtime container per user. This is a practical isolation boundary for MVP, but it should not be described as a hardened security sandbox.
 
 ### Separate browser and internal addresses
 
-CrewClaw intentionally splits user-facing and internal runtime addresses:
+ClawLoops intentionally splits user-facing and internal runtime addresses:
 
 - `browserUrl`: the browser entry point exposed through Traefik
 - `internalEndpoint`: the internal service address used by the platform and runtime manager

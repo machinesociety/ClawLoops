@@ -148,7 +148,7 @@ async def ensure_container_running(body: EnsureContainerRequest) -> ContainerSta
     return ContainerStateResponse(
         runtimeId="rt_001",
         observedState="creating",
-        internalEndpoint="http://crewclaw-u001:3000",
+        internalEndpoint="http://clawloops-u001:3000",
         message="creating",
     )
 
@@ -178,7 +178,7 @@ async def get_container_state(runtime_id: str) -> ContainerStateResponse:
     return ContainerStateResponse(
         runtimeId=runtime_id,
         observedState="running",
-        internalEndpoint="http://crewclaw-u001:3000",
+        internalEndpoint="http://clawloops-u001:3000",
         message="running",
     )
 

@@ -23,7 +23,7 @@ class _FakeBindingPort:
             self.binding = RuntimeBindingSnapshot(
                 runtimeId="rt_001",
                 volumeId="vol_001",
-                imageRef="crewclaw-runtime-wrapper:openclaw-1.0.0",
+                imageRef="clawloops-runtime-wrapper:openclaw-1.0.0",
                 desiredState=DesiredState.stopped,
                 observedState=ObservedState.stopped,
                 browserUrl=None,
@@ -76,7 +76,7 @@ class _FakeRuntimeManagerPort:
         return {
             "runtimeId": payload["runtimeId"],
             "observedState": "creating",
-            "internalEndpoint": "http://crewclaw-u001:3000",
+            "internalEndpoint": "http://clawloops-u001:3000",
             "message": "creating",
         }
 
@@ -92,14 +92,14 @@ def _make_fake_runtime_service() -> RuntimeService:
     model_port = _FakeModelConfigPort()
     runtime_manager = _FakeRuntimeManagerPort()
     task_repo = InMemoryRuntimeTaskRepository()
-    renderer = RuntimeConfigRenderer(base_dir="/tmp/crewclaw-int-tests")
+    renderer = RuntimeConfigRenderer(base_dir="/tmp/clawloops-int-tests")
     return RuntimeService(
         binding_service=binding_port,
         model_config_service=model_port,
         runtime_manager=runtime_manager,
         task_repo=task_repo,
         config_renderer=renderer,
-        route_host_suffix="crewclaw.test",
+        route_host_suffix="clawloops.test",
     )
 
 

@@ -1,5 +1,5 @@
 {
-    "name": "crewclaw-dev",
+    "name": "clawloops-dev",
     "build": {
       "dockerfile": "Dockerfile",
       "context": ".."

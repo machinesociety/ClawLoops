@@ -1,7 +1,7 @@
 [project]
-name = "crewclaw-backend"
+name = "clawloops-backend"
 version = "0.1.0"
-description = "CrewClaw MVP control plane backend."
+description = "ClawLoops MVP control plane backend."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

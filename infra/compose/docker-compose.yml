@@ -22,6 +22,9 @@ services:
     build:
       context: ../..
       dockerfile: apps/clawloops-api/Dockerfile
+      args:
+        APT_MIRROR: ${API_APT_MIRROR:-deb.debian.org}
+        PIP_INDEX_URL: ${API_PIP_INDEX_URL:-https://pypi.org/simple}
     container_name: crewclaw-api
     restart: unless-stopped
     environment:
@@ -39,6 +42,9 @@ services:
     build:
       context: ../..
       dockerfile: apps/clawloops-web/Dockerfile
+      args:
+        NPM_REGISTRY: ${WEB_NPM_REGISTRY:-https://registry.npmjs.org}
+        PNPM_REGISTRY: ${WEB_PNPM_REGISTRY:-https://registry.npmjs.org}
     container_name: crewclaw-web
     restart: unless-stopped
     environment:
@@ -57,6 +63,8 @@ services:
     build:
       context: ../..
       dockerfile: services/runtime-manager/Dockerfile
+      args:
+        PIP_INDEX_URL: ${RUNTIME_MANAGER_PIP_INDEX_URL:-https://pypi.org/simple}
     container_name: crewclaw-runtime-manager
     restart: unless-stopped
     environment:

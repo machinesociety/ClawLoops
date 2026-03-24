@@ -5,7 +5,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+ARG APT_MIRROR=deb.debian.org
+ARG PIP_INDEX_URL=https://pypi.org/simple
+RUN if [ -f /etc/apt/sources.list ]; then sed -i "s|deb.debian.org|${APT_MIRROR}|g" /etc/apt/sources.list; fi \
+    && if [ -f /etc/apt/sources.list.d/debian.sources ]; then sed -i "s|deb.debian.org|${APT_MIRROR}|g" /etc/apt/sources.list.d/debian.sources; fi \
+    && apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
@@ -13,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY apps/clawloops-api/pyproject.toml /app/pyproject.toml
 COPY apps/clawloops-api/app /app/app
 
+ENV PIP_INDEX_URL=${PIP_INDEX_URL}
 RUN pip install --no-cache-dir .
 
 EXPOSE 8000

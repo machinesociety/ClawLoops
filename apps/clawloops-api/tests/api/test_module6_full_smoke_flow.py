@@ -80,10 +80,14 @@ class _FakeRuntimeManagerPort:
             "message": "creating",
         }
 
-    def stop(self, runtime_id: str) -> dict:
+    def stop(self, user_id: str, runtime_id: str) -> dict:
+        _ = user_id
         return {"status": "accepted"}
 
-    def delete(self, runtime_id: str, retention_policy: str) -> dict:
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+        _ = user_id
+        _ = runtime_id
+        _ = retention_policy
         return {"status": "accepted"}
 
 

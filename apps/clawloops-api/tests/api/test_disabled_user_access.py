@@ -65,7 +65,7 @@ def test_disabled_user_business_interfaces_all_return_user_disabled(client):
     endpoints = [
         ("get", "/api/v1/users/me/runtime", None),
         ("post", "/api/v1/users/me/runtime/stop", None),
-        ("delete", "/api/v1/users/me/runtime", None),
+        ("post", "/api/v1/users/me/runtime/delete", {"retentionPolicy": "preserve_workspace"}),
         ("get", "/api/v1/models", None),
         ("get", "/api/v1/usage/summary", None),
         ("get", "/api/v1/workspace-entry", None),

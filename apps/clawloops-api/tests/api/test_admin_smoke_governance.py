@@ -47,11 +47,14 @@ class _DummyRuntimeManager:
             "message": "creating",
         }
 
-    def stop(self, runtime_id: str) -> dict:
+    def stop(self, user_id: str, runtime_id: str) -> dict:
+        _ = user_id
         self.stopped.add(runtime_id)
         return {"runtimeId": runtime_id, "message": "stopped"}
 
-    def delete(self, runtime_id: str, retention_policy: str) -> dict:
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+        _ = user_id
+        _ = runtime_id
         _ = retention_policy
         return {"runtimeId": runtime_id, "message": "deleted"}
 

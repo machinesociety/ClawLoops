@@ -67,7 +67,6 @@ class RuntimeService:
             payload = {
                 "userId": user_id,
                 "runtimeId": binding.runtimeId,
-                "imageRef": binding.imageRef,
                 "volumeId": binding.volumeId,
                 "routeHost": route_host,
                 "configMount": {
@@ -75,6 +74,10 @@ class RuntimeService:
                     "secretFilePath": secret_file_path,
                 },
                 "retentionPolicy": binding.retentionPolicy.value,
+                "compat": {
+                    "openclawConfigDir": f"/var/lib/clawloops/{user_id}/openclaw-config",
+                    "openclawWorkspaceDir": f"/var/lib/clawloops/{user_id}/workspace",
+                },
             }
             resp = self._runtime_manager.ensure_running(payload)
             observed_state = resp.get("observedState", ObservedState.creating.value)
@@ -118,7 +121,7 @@ class RuntimeService:
         self._task_repo.save(task)
 
         try:
-            self._runtime_manager.stop(binding.runtimeId)
+            self._runtime_manager.stop(user_id=user_id, runtime_id=binding.runtimeId)
             # 停止后将 desired/observed 统一置为 stopped
             self._binding_service.patch_binding_state(
                 user_id=user_id,
@@ -156,7 +159,11 @@ class RuntimeService:
         self._task_repo.save(task)
 
         try:
-            self._runtime_manager.delete(binding.runtimeId, effective_policy)
+            self._runtime_manager.delete(
+                user_id=user_id,
+                runtime_id=binding.runtimeId,
+                retention_policy=effective_policy,
+            )
             self._binding_service.patch_binding_state(
                 user_id=user_id,
                 desired_state=DesiredState.deleted.value,
@@ -254,10 +261,13 @@ class RuntimeManagerPortAdapter(RuntimeManagerPort):
     def ensure_running(self, payload: dict) -> dict:
         return self._client.ensure_running(payload)
 
-    def stop(self, runtime_id: str) -> dict:
-        return self._client.stop(runtime_id)
+    def stop(self, user_id: str, runtime_id: str) -> dict:
+        return self._client.stop(user_id=user_id, runtime_id=runtime_id)
 
-    def delete(self, runtime_id: str, retention_policy: str) -> dict:
-        _ = retention_policy
-        return self._client.delete(runtime_id)
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+        return self._client.delete(
+            user_id=user_id,
+            runtime_id=runtime_id,
+            retention_policy=retention_policy,
+        )
 

@@ -59,7 +59,7 @@ async def stop_runtime(
     )
 
 
-@router.delete("/users/me/runtime", response_model=RuntimeActionAcceptedResponse, status_code=202)
+@router.post("/users/me/runtime/delete", response_model=RuntimeActionAcceptedResponse, status_code=202)
 async def delete_runtime(
     body: DeleteRuntimeRequest | None = None,
     ctx: AuthContext = Depends(require_active_user),

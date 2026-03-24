@@ -46,13 +46,31 @@ class ConfigMount(BaseModel):
     secretFilePath: str
 
 
+class CompatConfig(BaseModel):
+    openclawConfigDir: str
+    openclawWorkspaceDir: str
+
+
 class EnsureContainerRequest(BaseModel):
     userId: str
     runtimeId: str
-    imageRef: str
     volumeId: str
     routeHost: str
-    configMount: ConfigMount
+    configMount: ConfigMount | None = None
+    retentionPolicy: str
+    compat: CompatConfig
+    env: dict[str, str] | None = None
+    envOverrides: dict[str, str] | None = None
+
+
+class StopContainerRequest(BaseModel):
+    userId: str
+    runtimeId: str
+
+
+class DeleteContainerRequest(BaseModel):
+    userId: str
+    runtimeId: str
     retentionPolicy: str
 
 

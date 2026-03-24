@@ -63,8 +63,8 @@ class FakeModelConfigPort:
 class FakeRuntimeManagerPort:
     def __init__(self) -> None:
         self.ensure_payloads: list[dict] = []
-        self.stop_runtime_ids: list[str] = []
-        self.delete_calls: list[tuple[str, str]] = []
+        self.stop_calls: list[tuple[str, str]] = []
+        self.delete_calls: list[tuple[str, str, str]] = []
         self.should_fail = False
 
     def ensure_running(self, payload: dict) -> dict:
@@ -78,14 +78,14 @@ class FakeRuntimeManagerPort:
             "message": "creating",
         }
 
-    def stop(self, runtime_id: str) -> dict:
-        self.stop_runtime_ids.append(runtime_id)
+    def stop(self, user_id: str, runtime_id: str) -> dict:
+        self.stop_calls.append((user_id, runtime_id))
         if self.should_fail:
             raise RuntimeError("stop error")
         return {"status": "accepted"}
 
-    def delete(self, runtime_id: str, retention_policy: str) -> dict:
-        self.delete_calls.append((runtime_id, retention_policy))
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+        self.delete_calls.append((user_id, runtime_id, retention_policy))
         if self.should_fail:
             raise RuntimeError("delete error")
         return {"status": "accepted"}
@@ -160,6 +160,9 @@ def test_ensure_running_creates_binding_and_calls_runtime_manager(tmp_path):
     assert "configMount" in payload
     assert "configFilePath" in payload["configMount"]
     assert "secretFilePath" in payload["configMount"]
+    assert "compat" in payload
+    assert payload["compat"]["openclawConfigDir"]
+    assert payload["compat"]["openclawWorkspaceDir"]
 
 
 def test_ensure_running_failure_sets_error_state_and_last_error():
@@ -186,7 +189,7 @@ def test_stop_runtime_idempotent_and_updates_state():
     assert binding_port.binding is not None
     assert binding_port.binding.desiredState == DesiredState.stopped
     assert binding_port.binding.observedState == ObservedState.stopped
-    assert runtime_manager.stop_runtime_ids == [binding_port.binding.runtimeId]
+    assert runtime_manager.stop_calls == [("u_001", binding_port.binding.runtimeId)]
 
 
 def test_delete_respects_retention_policy_and_marks_deleted():
@@ -201,5 +204,7 @@ def test_delete_respects_retention_policy_and_marks_deleted():
     assert binding_port.binding.observedState == ObservedState.deleted
     assert binding_port.binding.browserUrl is None
     assert binding_port.binding.internalEndpoint is None
-    assert runtime_manager.delete_calls == [(binding_port.binding.runtimeId, "wipe_workspace")]
+    assert runtime_manager.delete_calls == [
+        ("u_001", binding_port.binding.runtimeId, "wipe_workspace")
+    ]
 

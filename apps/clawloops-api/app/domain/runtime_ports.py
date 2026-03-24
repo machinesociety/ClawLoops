@@ -66,10 +66,10 @@ class RuntimeManagerPort(Protocol):
     def ensure_running(self, payload: dict) -> dict:
         ...
 
-    def stop(self, runtime_id: str) -> dict:
+    def stop(self, user_id: str, runtime_id: str) -> dict:
         ...
 
-    def delete(self, runtime_id: str, retention_policy: str) -> dict:
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
         ...
 
 

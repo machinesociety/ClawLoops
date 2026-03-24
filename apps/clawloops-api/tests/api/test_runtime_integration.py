@@ -82,10 +82,14 @@ class FakeRuntimeManagerPort:
             "message": "creating",
         }
 
-    def stop(self, runtime_id: str) -> dict:
+    def stop(self, user_id: str, runtime_id: str) -> dict:
+        _ = user_id
         return {"status": "accepted"}
 
-    def delete(self, runtime_id: str, retention_policy: str) -> dict:
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+        _ = user_id
+        _ = runtime_id
+        _ = retention_policy
         return {"status": "accepted"}
 
 
@@ -140,9 +144,11 @@ def test_half_main_flow_login_sync_ensure_start_and_query_task(client, app):
         # runtime manager 被调用，并携带关键字段
         assert len(runtime_manager.ensure_payloads) == 1
         payload = runtime_manager.ensure_payloads[0]
-        assert payload["imageRef"]
         assert payload["volumeId"]
         assert payload["routeHost"]
+        assert "compat" in payload
+        assert payload["compat"]["openclawConfigDir"]
+        assert payload["compat"]["openclawWorkspaceDir"]
         assert "configMount" in payload
         assert "configFilePath" in payload["configMount"]
         assert "secretFilePath" in payload["configMount"]

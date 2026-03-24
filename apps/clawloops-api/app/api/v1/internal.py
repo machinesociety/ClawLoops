@@ -4,10 +4,12 @@ from app.core.dependencies import get_user_service
 from app.domain.users import DesiredState, ObservedState, RetentionPolicy
 from app.schemas.internal import (
     ContainerStateResponse,
+    DeleteContainerRequest,
     EnsureContainerRequest,
     ModelConfigResponse,
     RuntimeBindingStateUpdateRequest,
     RuntimeBindingUpsertRequest,
+    StopContainerRequest,
     SyncUserRequest,
     UsageRecordItem,
 )
@@ -154,19 +156,20 @@ async def ensure_container_running(body: EnsureContainerRequest) -> ContainerSta
 
 
 @router.post("/runtime-manager/containers/stop")
-async def stop_container() -> dict:
+async def stop_container(body: StopContainerRequest) -> dict:
     """
     停止容器占位。
     """
-    return {"status": "accepted"}
+    return {"runtimeId": body.runtimeId, "observedState": "stopped", "message": "stopped"}
 
 
 @router.post("/runtime-manager/containers/delete")
-async def delete_container() -> dict:
+async def delete_container(body: DeleteContainerRequest) -> dict:
     """
     删除容器占位。
     """
-    return {"status": "accepted"}
+    _ = body.retentionPolicy
+    return {"runtimeId": body.runtimeId, "observedState": "deleted", "message": "deleted"}
 
 
 @router.get("/runtime-manager/containers/{runtime_id}", response_model=ContainerStateResponse)

@@ -1,36 +1,44 @@
 """
-与 runtime-manager 通信的 HTTP 客户端占位。
-
-TODO:
-- 使用 httpx 或 requests 实现真实调用。
-- 从配置读取 runtime-manager 基础地址。
+与 runtime-manager 通信的 HTTP 客户端。
 """
 
+from __future__ import annotations
+
 from typing import Any
+
+import httpx
 
 
 class RuntimeManagerClient:
     def __init__(self, base_url: str) -> None:
-        self._base_url = base_url
+        self._base_url = base_url.rstrip("/")
+        self._timeout = httpx.Timeout(10.0, connect=5.0)
+
+    def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        with httpx.Client(base_url=self._base_url, timeout=self._timeout) as client:
+            response = client.post(path, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        if not isinstance(data, dict):
+            raise RuntimeError("runtime-manager response is not a JSON object")
+        return data
 
     def ensure_running(self, payload: dict) -> dict:
-        """
-        发送 ensure-running 请求的占位实现。
-        """
+        return self._post("/internal/runtime-manager/containers/ensure-running", payload)
 
-        _ = payload
-        return {
-            "runtimeId": "rt_001",
-            "observedState": "creating",
-            "internalEndpoint": "http://clawloops-u001:3000",
-            "message": "creating",
-        }
+    def stop(self, user_id: str, runtime_id: str) -> Any:
+        return self._post(
+            "/internal/runtime-manager/containers/stop",
+            {"userId": user_id, "runtimeId": runtime_id},
+        )
 
-    def stop(self, runtime_id: str) -> Any:
-        _ = runtime_id
-        return {"status": "accepted"}
-
-    def delete(self, runtime_id: str) -> Any:
-        _ = runtime_id
-        return {"status": "accepted"}
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> Any:
+        return self._post(
+            "/internal/runtime-manager/containers/delete",
+            {
+                "userId": user_id,
+                "runtimeId": runtime_id,
+                "retentionPolicy": retention_policy,
+            },
+        )
 

@@ -37,6 +37,7 @@ class EnsureRunningRequest(ContractModel):
 class EnsureRunningResponse(ContractModel):
     runtime_id: str = Field(..., min_length=1)
     observed_state: ObservedState
+    browser_url: str | None = None
     internal_endpoint: str | None = None
     message: str = Field(..., min_length=1)
 
@@ -67,6 +68,7 @@ class DeleteResponse(ContractModel):
 class RuntimeStatusResponse(ContractModel):
     runtime_id: str = Field(..., min_length=1)
     observed_state: ObservedState
+    browser_url: str | None = None
     internal_endpoint: str | None = None
     message: str = Field(..., min_length=1)
 

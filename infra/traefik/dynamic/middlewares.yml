@@ -1,4 +1,29 @@
 http:
+  routers:
+    clawloops_web:
+      rule: "Host(`clawloops.localhost`)"
+      entryPoints:
+        - web
+      service: clawloops_web
+
+    clawloops_api:
+      rule: "Host(`clawloops.localhost`) && PathPrefix(`/api`)"
+      entryPoints:
+        - web
+      service: clawloops_api
+
+    runtime_manager:
+      rule: "Host(`runtime-manager.clawloops.localhost`)"
+      entryPoints:
+        - web
+      service: runtime_manager
+
+    authentik_outpost:
+      rule: "Host(`clawloops.localhost`) && PathPrefix(`/outpost.goauthentik.io/`)"
+      entryPoints:
+        - web
+      service: authentik_outpost
+
   middlewares:
     authentik-forwardauth:
       forwardAuth:
@@ -16,3 +41,21 @@ http:
           - X-authentik-meta-provider
           - X-authentik-meta-app
           - X-authentik-meta-version
+
+  services:
+    clawloops_web:
+      loadBalancer:
+        servers:
+          - url: "http://clawloops-web:3000"
+    clawloops_api:
+      loadBalancer:
+        servers:
+          - url: "http://clawloops-api:8000"
+    runtime_manager:
+      loadBalancer:
+        servers:
+          - url: "http://runtime-manager:18080"
+    authentik_outpost:
+      loadBalancer:
+        servers:
+          - url: "http://authentik-proxy-outpost:9000"

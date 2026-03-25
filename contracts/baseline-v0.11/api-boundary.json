@@ -1,0 +1,72 @@
+{
+  "baselineVersion": "v0.11-no-real-email-friendly",
+  "frozenAt": "2026-03-25",
+  "rules": [
+    {
+      "id": "user_runtime_vs_status_boundary",
+      "appliesTo": ["GET /api/v1/users/me/runtime/status"],
+      "forbidFields": ["volumeId", "imageRef", "retentionPolicy", "internalEndpoint"],
+      "allowFields": [
+        "runtimeId",
+        "desiredState",
+        "observedState",
+        "task.status",
+        "ready",
+        "browserUrl",
+        "reason",
+        "lastError"
+      ],
+      "reason": "status 接口是高频轮询投影，不返回稳定资源详情字段"
+    },
+    {
+      "id": "workspace_entry_is_only_redirect_gate",
+      "appliesTo": ["GET /api/v1/workspace-entry"],
+      "mustContainFields": ["ready", "hasWorkspace", "runtimeId", "browserUrl", "reason"],
+      "reason": "workspace-entry 是唯一跳转裁决接口，前端只在 ready=true 时跳转"
+    },
+    {
+      "id": "disabled_user_global_semantics",
+      "appliesTo": [
+        "GET /api/v1/users/me/runtime",
+        "GET /api/v1/users/me/runtime/status",
+        "POST /api/v1/users/me/runtime/start",
+        "POST /api/v1/users/me/runtime/stop",
+        "POST /api/v1/users/me/runtime/delete",
+        "GET /api/v1/models",
+        "GET /api/v1/workspace-entry",
+        "GET /api/v1/users/me/quota"
+      ],
+      "mustReturnError": { "http": 403, "code": "USER_DISABLED" },
+      "except": ["GET /api/v1/auth/me", "GET /api/v1/auth/access", "GET /api/v1/auth/options"],
+      "reason": "disabled 用户除 auth/me 与 auth/access 外统一收口为 403 USER_DISABLED"
+    },
+    {
+      "id": "auth_access_always_200",
+      "appliesTo": ["GET /api/v1/auth/access"],
+      "mustReturnHttp": 200,
+      "reason": "auth/access 永远 200，仅用于状态判断"
+    },
+    {
+      "id": "runtime_delete_post_only",
+      "appliesTo": ["POST /api/v1/users/me/runtime/delete"],
+      "forbidPaths": ["DELETE /api/v1/users/me/runtime"],
+      "reason": "runtime 删除使用 POST，不依赖 DELETE body"
+    },
+    {
+      "id": "runtime_manager_ensure_running_forbid_image_ref",
+      "appliesTo": ["POST /internal/runtime-manager/containers/ensure-running"],
+      "forbidRequestFields": ["imageRef", "networkName", "gatewayPort"],
+      "requireRequestFields": [
+        "userId",
+        "runtimeId",
+        "volumeId",
+        "routeHost",
+        "retentionPolicy",
+        "compat.openclawConfigDir",
+        "compat.openclawWorkspaceDir"
+      ],
+      "reason": "RM V1 请求体删除 imageRef，固定网络与端口由执行器内部约束，compat 必填"
+    }
+  ]
+}
+

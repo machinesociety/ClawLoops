@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawloops:contracts:baseline-v0.11:Invitation",
+  "title": "Invitation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "invitationId",
+    "inviteTokenHash",
+    "targetEmail",
+    "workspaceId",
+    "role",
+    "status",
+    "expiresAt"
+  ],
+  "properties": {
+    "invitationId": { "type": "string", "minLength": 1 },
+    "inviteTokenHash": { "type": "string", "minLength": 1 },
+    "targetEmail": { "type": "string", "minLength": 1 },
+    "loginUsername": { "type": ["string", "null"], "minLength": 1 },
+    "workspaceId": { "type": "string", "minLength": 1 },
+    "workspaceName": { "type": ["string", "null"] },
+    "role": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["pending", "consumed", "revoked"] },
+    "expiresAt": { "type": "string", "minLength": 1 },
+    "consumedAt": { "type": ["string", "null"] },
+    "consumedByUserId": { "type": ["string", "null"] },
+    "authentikInvitationRef": { "type": ["string", "null"] },
+    "lastError": { "type": ["string", "null"] },
+    "createdAt": { "type": ["string", "null"] },
+    "createdByUserId": { "type": ["string", "null"] }
+  }
+}
+

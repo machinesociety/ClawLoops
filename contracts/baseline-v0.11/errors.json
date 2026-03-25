@@ -1,0 +1,34 @@
+{
+  "baselineVersion": "v0.11-no-real-email-friendly",
+  "frozenAt": "2026-03-25",
+  "errors": [
+    { "http": 401, "code": "UNAUTHENTICATED", "scope": ["user", "admin", "public", "internal"] },
+    { "http": 403, "code": "ACCESS_DENIED", "scope": ["user", "admin", "internal"] },
+    { "http": 403, "code": "USER_DISABLED", "scope": ["user", "admin", "internal"] },
+
+    { "http": 404, "code": "USER_NOT_FOUND", "scope": ["admin", "internal"] },
+    { "http": 404, "code": "RUNTIME_NOT_FOUND", "scope": ["user", "admin", "internal"] },
+    { "http": 404, "code": "INVITATION_NOT_FOUND", "scope": ["public", "admin", "internal"] },
+    { "http": 404, "code": "MODEL_NOT_FOUND", "scope": ["user", "admin", "internal"] },
+
+    { "http": 409, "code": "RUNTIME_ACTION_CONFLICT", "scope": ["user", "admin", "internal"] },
+    { "http": 409, "code": "RUNTIME_CONTRACT_DRIFT", "scope": ["internal"] },
+    { "http": 409, "code": "INVITATION_ALREADY_CONSUMED", "scope": ["public", "admin", "internal"] },
+    { "http": 409, "code": "INVITATION_REVOKED", "scope": ["public", "admin", "internal"] },
+
+    { "http": 410, "code": "INVITATION_EXPIRED", "scope": ["public", "admin", "internal"] },
+
+    { "http": 422, "code": "INVITATION_EMAIL_MISMATCH", "scope": ["user", "internal"] },
+    { "http": 422, "code": "INVITATION_WORKSPACE_INVALID", "scope": ["public", "user", "admin", "internal"] },
+    { "http": 422, "code": "QUOTA_EXCEEDED", "scope": ["user", "admin"] },
+
+    { "http": 500, "code": "RUNTIME_STOP_FAILED", "scope": ["user", "admin", "internal"] },
+    { "http": 500, "code": "RUNTIME_DELETE_FAILED", "scope": ["user", "admin", "internal"] },
+    { "http": 500, "code": "INTERNAL_ERROR", "scope": ["user", "admin", "internal"] },
+
+    { "http": 502, "code": "INVITATION_ERROR", "scope": ["public", "internal"] },
+    { "http": 502, "code": "USER_SYNC_ERROR", "scope": ["internal"] },
+    { "http": 502, "code": "RUNTIME_START_FAILED", "scope": ["user", "admin", "internal"] }
+  ]
+}
+

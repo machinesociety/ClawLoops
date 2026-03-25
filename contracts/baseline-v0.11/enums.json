@@ -1,0 +1,23 @@
+{
+  "baselineVersion": "v0.11-no-real-email-friendly",
+  "frozenAt": "2026-03-25",
+  "enums": {
+    "role": ["user", "admin"],
+    "user.status": ["active", "disabled"],
+    "auth.provider": ["authentik"],
+    "auth.method": ["local_password"],
+
+    "runtime.desiredState": ["running", "stopped", "deleted"],
+    "runtime.observedState": ["creating", "running", "stopped", "error", "deleted"],
+    "retentionPolicy": ["preserve_workspace", "wipe_workspace"],
+
+    "task.action": ["ensure_running", "stop", "delete"],
+    "task.status": ["pending", "running", "succeeded", "failed", "canceled"],
+
+    "invitation.status": ["pending", "consumed", "revoked"],
+
+    "accessGate.reason": ["USER_DISABLED"],
+    "workspaceEntry.reason": ["RUNTIME_PREPARING"]
+  }
+}
+

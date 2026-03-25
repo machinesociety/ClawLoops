@@ -32,6 +32,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - CLAWLOOPS_ROUTE_HOST_SUFFIX=${CLAWLOOPS_DOMAIN}
+      - CLAWLOOPS_AUTH_HEADER_SUBJECT=X-authentik-uid
     labels:
       - traefik.enable=true
       - traefik.http.routers.clawloops_api.rule=Host(`${CLAWLOOPS_DOMAIN}`) && PathPrefix(`/api`)
@@ -165,7 +166,10 @@ services:
     depends_on:
       - authentik-server
     environment:
+      # 容器内访问 Authentik API（内部 DNS）
       AUTHENTIK_HOST: http://authentik-server:9000
+      # 浏览器里必须使用本机可达地址，否则会跳到 http://authentik-server:9000/... 导致 502
+      AUTHENTIK_HOST_BROWSER: ${AUTHENTIK_PUBLIC_URL:-http://localhost:9000}
       AUTHENTIK_INSECURE: "true"
       AUTHENTIK_TOKEN: ${AUTHENTIK_OUTPOST_TOKEN}
     labels:

@@ -10,7 +10,7 @@ class AppSettings(BaseSettings):
     log_level: str = "INFO"
 
     # Authentik / 认证相关头部配置
-    auth_header_subject: str = "X-Authentik-Subject"
+    auth_header_subject: str = "X-authentik-uid"
     auth_header_email: str = "X-Authentik-Email"
     auth_header_groups: str = "X-Authentik-Groups"
     authentik_public_url: str = "http://localhost:9000"

@@ -4,18 +4,24 @@ http:
       rule: "Host(`clawloops.localhost`)"
       entryPoints:
         - web
+      middlewares:
+        - authentik-forwardauth
       service: clawloops_web
 
     clawloops_api:
       rule: "Host(`clawloops.localhost`) && PathPrefix(`/api`)"
       entryPoints:
         - web
+      middlewares:
+        - authentik-forwardauth
       service: clawloops_api
 
     runtime_manager:
       rule: "Host(`runtime-manager.clawloops.localhost`)"
       entryPoints:
         - web
+      middlewares:
+        - authentik-forwardauth
       service: runtime_manager
 
     authentik_outpost:

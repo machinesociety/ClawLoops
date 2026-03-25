@@ -17,7 +17,6 @@ class AuthContext(BaseModel):
     isAdmin: bool = False
     isDisabled: bool = False
 
-
 def build_auth_context_from_request(
     request: Request,
     settings: AppSettings,
@@ -30,8 +29,18 @@ def build_auth_context_from_request(
     - 若用户不存在，则以默认值创建（tenantId=t_default, role=user, status=active）。
     """
 
-    subject_header = settings.auth_header_subject
-    subject_id = request.headers.get(subject_header)
+    configured_subject_header = settings.auth_header_subject
+    candidate_headers = [
+        configured_subject_header,
+        "X-authentik-uid",
+        "X-Authentik-Uid",
+        "X-Authentik-Subject",
+    ]
+    subject_id = None
+    for header_name in candidate_headers:
+        subject_id = request.headers.get(header_name)
+        if subject_id:
+            break
     if not subject_id:
         raise UnauthenticatedError()
 

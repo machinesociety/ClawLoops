@@ -251,7 +251,6 @@ async function request<T>(
     credentials: 'include',
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
-
   if (!res.ok) {
     let errorData: { code?: string; message?: string } = {};
     try {

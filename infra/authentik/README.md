@@ -2,6 +2,10 @@
 
 This folder stores local integration config for official Authentik images.
 
+**Full setup (wizard, Proxy Provider, Outpost, token, verification):** [AUTHENTIK_SETUP.zh-CN.md](./AUTHENTIK_SETUP.zh-CN.md)（中文）。
+
+**Authentik Groups → ClawLoops 应用管理员（方案 C，合并主文档 §11.4 用）：** [AUTHENTIK_Group_Mapping.zh-CN.md](./AUTHENTIK_Group_Mapping.zh-CN.md)。
+
 ## Version pinning
 
 - Authentik server/worker/proxy image tag is pinned by `AUTHENTIK_VERSION` in `.env`.

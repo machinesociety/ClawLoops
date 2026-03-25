@@ -1,5 +1,26 @@
 http:
   routers:
+    clawloops_web_public_invite:
+      rule: "Host(`clawloops.localhost`) && PathPrefix(`/invite`)"
+      priority: 1000
+      entryPoints:
+        - web
+      service: clawloops_web
+
+    clawloops_web_public_assets:
+      rule: "Host(`clawloops.localhost`) && (PathPrefix(`/assets`) || Path(`/favicon.ico`) || Path(`/robots.txt`) || Path(`/manifest.webmanifest`))"
+      priority: 1000
+      entryPoints:
+        - web
+      service: clawloops_web
+
+    clawloops_api_public_invitations:
+      rule: "Host(`clawloops.localhost`) && PathPrefix(`/api/v1/public/invitations`)"
+      priority: 1000
+      entryPoints:
+        - web
+      service: clawloops_api
+
     clawloops_web:
       rule: "Host(`clawloops.localhost`)"
       entryPoints:

@@ -148,6 +148,14 @@ class InvitationError(AppError):
     )
 
 
+class InvitationConfigError(AppError):
+    spec = ErrorSpec(
+        http_status=HTTPStatus.SERVICE_UNAVAILABLE,
+        code="INVITATION_CONFIG_ERROR",
+        message="Invitation flow configuration error.",
+    )
+
+
 ERROR_TYPE_MAP: dict[Type[AppError], ErrorSpec] = {
     UnauthenticatedError: UnauthenticatedError.spec,
     UserDisabledError: UserDisabledError.spec,
@@ -164,5 +172,6 @@ ERROR_TYPE_MAP: dict[Type[AppError], ErrorSpec] = {
     InvitationEmailMismatchError: InvitationEmailMismatchError.spec,
     InvitationWorkspaceInvalidError: InvitationWorkspaceInvalidError.spec,
     InvitationError: InvitationError.spec,
+    InvitationConfigError: InvitationConfigError.spec,
 }
 

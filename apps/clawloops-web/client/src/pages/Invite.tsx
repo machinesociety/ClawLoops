@@ -61,6 +61,7 @@ type InvalidCode =
   | 'INVITATION_REVOKED'
   | 'INVITATION_EXPIRED'
   | 'INVITATION_WORKSPACE_INVALID'
+  | 'INVITATION_CONFIG_ERROR'
   | 'INVITATION_ERROR'
   | 'UNKNOWN';
 
@@ -70,6 +71,7 @@ const INVALID_MESSAGES: Record<InvalidCode, { title: string; desc: string; recov
   INVITATION_REVOKED:           { title: '邀请已撤销',       desc: '该邀请已被管理员撤销，请联系管理员重新发起邀请。',     recoverable: false },
   INVITATION_EXPIRED:           { title: '邀请已过期',       desc: '该邀请链接已超过有效期，请联系管理员重新发起邀请。',   recoverable: false },
   INVITATION_WORKSPACE_INVALID: { title: '工作区不可用',     desc: '邀请对应的工作区当前不可用，请联系管理员处理。',       recoverable: false },
+  INVITATION_CONFIG_ERROR:      { title: '接入配置缺失',     desc: '平台未配置 enrollment flow（AUTHENTIK_ENROLLMENT_FLOW_SLUG）。请联系管理员完成配置后重试。', recoverable: false },
   INVITATION_ERROR:             { title: '系统暂时无法接入', desc: '接入流程遇到临时错误，您可以稍后重试。',               recoverable: true  },
   UNKNOWN:                      { title: '未知错误',         desc: '发生了未知错误，请稍后重试或联系管理员。',             recoverable: true  },
 };

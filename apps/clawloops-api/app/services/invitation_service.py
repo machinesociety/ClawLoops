@@ -4,13 +4,18 @@ import hashlib
 import secrets
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+from urllib.parse import quote
+
+import httpx
 
 from app.core.errors import (
     InvitationAlreadyConsumedError,
+    InvitationConfigError,
     InvitationEmailMismatchError,
     InvitationExpiredError,
     InvitationNotFoundError,
     InvitationRevokedError,
+    InvitationError,
 )
 from app.core.settings import AppSettings
 from app.domain.invitations import Invitation, InvitationStatus
@@ -138,10 +143,62 @@ class InvitationService:
         inv = self.get_public_preview(token)
         return inv
 
-    def build_authentik_redirect_url(self) -> str:
-        # 首版为延迟创建模式：这里先返回一个可联调占位 URL。
-        # 真正上线时应在此创建/换取 Authentik enrollment URL，并返回 itoken URL。
+    def build_authentik_redirect_url(self, inv: Invitation | None = None) -> str:
+        """
+        返回 Authentik enrollment flow 跳转 URL。
+
+        - 必须显式绑定 AUTHENTIK_ENROLLMENT_FLOW_SLUG（缺失直接失败）
+        - 生产期需要创建 Authentik invitation，换取真实 itoken；否则 Invitation Stage 会拒绝
+        """
         base = (self._settings.authentik_public_url or "").rstrip("/")
-        itoken = "stub"
-        return f"{base}/if/flow/clawloops-invitation-enrollment/?itoken={itoken}"
+        flow_slug = (self._settings.authentik_enrollment_flow_slug or "").strip()
+        if not flow_slug:
+            raise InvitationConfigError("Missing AUTHENTIK_ENROLLMENT_FLOW_SLUG.")
+
+        itoken = self._create_authentik_invitation(inv)
+        return f"{base}/if/flow/{quote(flow_slug)}/?itoken={quote(itoken)}"
+
+    def _create_authentik_invitation(self, inv: Invitation | None) -> str:
+        """
+        通过 Authentik API 创建 Invitation，并返回 itoken（uuid/pk）。
+        """
+        api_base = (self._settings.authentik_api_base_url or "").rstrip("/") or "http://authentik-server:9000"
+        token = (self._settings.authentik_api_token or "").strip()
+        if not token:
+            raise InvitationConfigError("Missing AUTHENTIK_API_TOKEN.")
+
+        payload: dict[str, object] = {
+            "name": f"clawloops-inv-{inv.invitation_id}" if inv is not None else f"clawloops-inv-{secrets.token_hex(8)}",
+            "single_use": True,
+        }
+        if inv is not None:
+            # 复用平台 invitation 的过期时间（Authentik 字段名为 expires）
+            try:
+                expires_dt = datetime.fromisoformat(inv.expires_at.replace("Z", "+00:00"))
+                payload["expires"] = expires_dt.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace(
+                    "+00:00", "Z"
+                )
+            except ValueError:
+                # 平台过期字段不可解析时不传，交由 Authentik 默认策略
+                pass
+
+        url = f"{api_base}/api/v3/stages/invitation/invitations/"
+        try:
+            resp = httpx.post(
+                url,
+                json=payload,
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                timeout=5.0,
+            )
+        except httpx.HTTPError as e:
+            raise InvitationError(f"Authentik API request failed: {e}") from e
+
+        if resp.status_code not in (200, 201):
+            raise InvitationError(f"Authentik API returned {resp.status_code}: {resp.text}")
+
+        data = resp.json()
+        itoken = data.get("pk") or data.get("id") or data.get("uuid")
+        if not itoken or not isinstance(itoken, str):
+            raise InvitationError("Authentik invitation response missing itoken.")
+        return itoken
 

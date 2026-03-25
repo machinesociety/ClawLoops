@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings
 
 
@@ -18,6 +19,29 @@ class AppSettings(BaseSettings):
     auth_admin_group_slugs: str = "clawloops-admins,authentik Admins"
     authentik_public_url: str = "http://localhost:9000"
     auth_post_login_redirect_url: str = "http://clawloops.localhost/post-login"
+    authentik_enrollment_flow_slug: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            # 文档冻结命名：允许不带前缀的配置
+            "AUTHENTIK_ENROLLMENT_FLOW_SLUG",
+            # 兼容现有 env_prefix=CLAWLOOPS_ 的习惯用法
+            "CLAWLOOPS_AUTHENTIK_ENROLLMENT_FLOW_SLUG",
+        ),
+    )
+    authentik_api_base_url: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "AUTHENTIK_API_BASE_URL",
+            "CLAWLOOPS_AUTHENTIK_API_BASE_URL",
+        ),
+    )
+    authentik_api_token: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "AUTHENTIK_API_TOKEN",
+            "CLAWLOOPS_AUTHENTIK_API_TOKEN",
+        ),
+    )
 
     # 预留后续接入的外部服务配置字段
     database_url: str | None = None

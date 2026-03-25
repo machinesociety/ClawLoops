@@ -58,6 +58,6 @@ async def start_invitation(
     return InvitationStartResponse(
         status="accepted",
         pendingInvitationSession=PendingInvitationSession(ttlSeconds=ttl_seconds),
-        redirectUrl=svc.build_authentik_redirect_url(),
+        redirectUrl=svc.build_authentik_redirect_url(inv),
     )
 

@@ -34,6 +34,13 @@ services:
       - CLAWLOOPS_ROUTE_HOST_SUFFIX=${CLAWLOOPS_DOMAIN}
       - CLAWLOOPS_AUTH_HEADER_SUBJECT=X-authentik-uid
       - CLAWLOOPS_AUTH_ADMIN_GROUP_SLUGS=${CLAWLOOPS_AUTH_ADMIN_GROUP_SLUGS:-clawloops-admins,authentik Admins}
+      # Invitation onboarding 必须显式绑定 enrollment flow（与 docs/后端 冻结一致）
+      - AUTHENTIK_ENROLLMENT_FLOW_SLUG=${AUTHENTIK_ENROLLMENT_FLOW_SLUG}
+      # 浏览器侧可达的 Authentik 公网根地址（用于拼接 /if/flow/...）
+      - CLAWLOOPS_AUTHENTIK_PUBLIC_URL=${AUTHENTIK_PUBLIC_URL:-http://localhost:9000}
+      # Authentik API（用于创建 invitation 换取 itoken）
+      - AUTHENTIK_API_BASE_URL=${AUTHENTIK_API_BASE_URL:-http://authentik-server:9000}
+      - AUTHENTIK_API_TOKEN=${AUTHENTIK_API_TOKEN:-}
     labels:
       - traefik.enable=true
       - traefik.http.routers.clawloops_api.rule=Host(`${CLAWLOOPS_DOMAIN}`) && PathPrefix(`/api`)

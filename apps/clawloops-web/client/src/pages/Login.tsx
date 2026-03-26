@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { authApi, AuthOptionsResponse, isAppError, getErrorCode } from '@/lib/api';
 import { RedirectIfAuthenticated } from '@/components/guards/RouteGuard';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +32,7 @@ interface FormErrors {
 
 function LoginForm() {
   const [, navigate] = useLocation();
+  const { refresh } = useAuth();
   const [options, setOptions] = useState<AuthOptionsResponse | null>(null);
   const [loginState, setLoginState] = useState<LoginState>('idle');
   const [formErrors, setFormErrors] = useState<FormErrors>({});
@@ -66,6 +68,14 @@ function LoginForm() {
     try {
       const result = await authApi.login({ username: username.trim(), password });
       setLoginState('success');
+
+      // Critical: AuthProvider boot state doesn't auto-refresh after login.
+      // Without this, guards may still treat user as unauthenticated until full page reload.
+      try {
+        await refresh();
+      } catch {
+        // ignore; still try to navigate based on login result
+      }
 
       // Navigate based on server response
       if (result.redirectTo === '/force-password-change' || result.mustChangePassword) {

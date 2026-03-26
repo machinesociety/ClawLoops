@@ -1,11 +1,24 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
 from app.models.session import SessionModel
+
+
+def _as_utc_aware(dt: datetime) -> datetime:
+    """
+    Normalize datetime for safe comparison.
+
+    SQLite (and some SQLAlchemy configs) may return naive datetimes even if the
+    app uses timezone-aware values. We treat naive values as UTC.
+    """
+
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 class SessionRecord:
@@ -54,6 +67,7 @@ class SqlAlchemySessionRepository(SessionRepository):
         self._session = session
 
     def get_valid_by_hash(self, session_id_hash: str, now: datetime) -> SessionRecord | None:
+        now_utc = _as_utc_aware(now)
         row = (
             self._session.query(SessionModel)
             .filter(SessionModel.session_id_hash == session_id_hash)
@@ -63,7 +77,7 @@ class SqlAlchemySessionRepository(SessionRepository):
             return None
         if row.revoked_at is not None:
             return None
-        if row.expires_at <= now:
+        if _as_utc_aware(row.expires_at) <= now_utc:
             return None
         return SessionRecord(
             user_id=row.user_id,
@@ -114,12 +128,13 @@ class InMemorySessionRepository(SessionRepository):
         self._records: dict[str, SessionRecord] = {}
 
     def get_valid_by_hash(self, session_id_hash: str, now: datetime) -> SessionRecord | None:
+        now_utc = _as_utc_aware(now)
         rec = self._records.get(session_id_hash)
         if rec is None:
             return None
         if rec.revoked_at is not None:
             return None
-        if rec.expires_at <= now:
+        if _as_utc_aware(rec.expires_at) <= now_utc:
             return None
         return rec
 

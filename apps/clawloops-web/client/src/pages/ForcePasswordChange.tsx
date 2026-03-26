@@ -34,7 +34,7 @@ interface FormErrors {
 
 function ForcePasswordChangeForm() {
   const [, navigate] = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, refresh } = useAuth();
   const [policy, setPolicy] = useState<PasswordPolicy | null>(null);
   const [pageState, setPageState] = useState<PageState>('idle');
   const [formErrors, setFormErrors] = useState<FormErrors>({});
@@ -97,6 +97,13 @@ function ForcePasswordChangeForm() {
       });
 
       setPageState('success');
+
+      // Critical: refresh session/access state so guards allow next page immediately.
+      try {
+        await refresh();
+      } catch {
+        // ignore; still navigate based on API response
+      }
 
       // Navigate based on response
       if (result.redirectTo) {

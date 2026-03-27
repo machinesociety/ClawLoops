@@ -33,6 +33,8 @@ services:
       - PYTHONUNBUFFERED=1
       - CLAWLOOPS_ROUTE_HOST_SUFFIX=${CLAWLOOPS_DOMAIN}
       - CLAWLOOPS_LITELLM_API_KEY=${LITELLM_MASTER_KEY:-sk-local-master}
+      - CLAWLOOPS_MODEL_GATEWAY_BASE_URL=${CLAWLOOPS_MODEL_GATEWAY_BASE_URL:-http://litellm:4000}
+      - CLAWLOOPS_MODEL_GATEWAY_DEFAULT_MODELS=${CLAWLOOPS_MODEL_GATEWAY_DEFAULT_MODELS:-qwen-max-proxy}
     labels:
       - traefik.enable=true
       - traefik.http.routers.clawloops_api.rule=Host(`${CLAWLOOPS_DOMAIN}`) && PathPrefix(`/api`)
@@ -102,12 +104,17 @@ services:
     container_name: crewclaw-litellm
     restart: unless-stopped
     command:
+      - --config
+      - /app/config.yaml
       - --host
       - "0.0.0.0"
       - --port
       - "4000"
     environment:
       - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-sk-local-master}
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
+    volumes:
+      - ./litellm.config.yaml:/app/config.yaml:ro
     networks:
       - clawloops_shared
 

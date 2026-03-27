@@ -193,9 +193,11 @@ def get_runtime_service(
 
     def get_model_config(user_id: str) -> ModelConfigResponse:
         _ = user_id
+        model_base_url = settings.model_gateway_base_url or "http://litellm:4000"
+        model_ids = settings.get_model_gateway_default_models()
         return ModelConfigResponse(
-            baseUrl="http://litellm:4000",
-            models=["gpt-4-mini"],
+            baseUrl=model_base_url,
+            models=model_ids,
             gatewayAccessTokenRef="token_ref_001",
             configRenderVersion="v1",
         )

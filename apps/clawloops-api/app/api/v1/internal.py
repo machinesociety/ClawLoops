@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Request, Response
 
 from app.core.auth import AuthContext
-from app.core.dependencies import get_auth_context, get_user_service
+from app.core.dependencies import get_app_settings, get_auth_context, get_user_service
 from app.core.errors import PasswordChangeRequiredError, UserDisabledError
+from app.core.settings import AppSettings
 from app.domain.users import DesiredState, ObservedState, RetentionPolicy
 from app.schemas.internal import (
     ContainerStateResponse,
@@ -144,14 +145,19 @@ async def update_runtime_binding_state(
 
 
 @router.get("/model-config/users/{user_id}", response_model=ModelConfigResponse)
-async def get_user_model_config(user_id: str) -> ModelConfigResponse:
+async def get_user_model_config(
+    user_id: str,
+    settings: AppSettings = Depends(get_app_settings),
+) -> ModelConfigResponse:
     """
     获取运行时模型配置。
     """
     _ = user_id
+    model_base_url = settings.model_gateway_base_url or "http://litellm:4000"
+    model_ids = settings.get_model_gateway_default_models()
     return ModelConfigResponse(
-        baseUrl="http://litellm:4000",
-        models=["gpt-4-mini"],
+        baseUrl=model_base_url,
+        models=model_ids,
         gatewayAccessTokenRef="token_ref_001",
         configRenderVersion="v1",
     )

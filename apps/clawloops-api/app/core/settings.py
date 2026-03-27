@@ -28,7 +28,12 @@ class AppSettings(BaseSettings):
     runtime_manager_base_url: str | None = None
     route_host_suffix: str = "clawloops.localhost"
     model_gateway_base_url: str | None = None
+    model_gateway_default_models: str = "qwen-max-proxy"
     litellm_api_key: str = "sk-local-master"
+
+    def get_model_gateway_default_models(self) -> list[str]:
+        models = [item.strip() for item in self.model_gateway_default_models.split(",")]
+        return [item for item in models if item]
 
     class Config:
         env_prefix = "CLAWLOOPS_"

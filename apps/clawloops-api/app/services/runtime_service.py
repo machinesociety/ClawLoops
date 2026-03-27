@@ -61,7 +61,7 @@ class RuntimeService:
 
         try:
             model_config = self._model_config_service.get_user_model_config(user_id)
-            config_file_path, secret_file_path = self._config_renderer.render(user_id, binding, model_config)
+            openclaw_json, config_version = self._config_renderer.render(user_id, binding, model_config)
 
             route_host = self._route_host_for_user(user_id)
             payload = {
@@ -69,14 +69,14 @@ class RuntimeService:
                 "runtimeId": binding.runtimeId,
                 "volumeId": binding.volumeId,
                 "routeHost": route_host,
-                "configMount": {
-                    "configFilePath": config_file_path,
-                    "secretFilePath": secret_file_path,
-                },
                 "retentionPolicy": binding.retentionPolicy.value,
                 "compat": {
                     "openclawConfigDir": f"/var/lib/clawloops/{user_id}/openclaw-config",
                     "openclawWorkspaceDir": f"/var/lib/clawloops/{user_id}/workspace",
+                },
+                "renderedConfig": {
+                    "configVersion": config_version,
+                    "openclawJson": openclaw_json,
                 },
             }
             resp = self._runtime_manager.ensure_running(payload)
@@ -163,6 +163,10 @@ class RuntimeService:
                 user_id=user_id,
                 runtime_id=binding.runtimeId,
                 retention_policy=effective_policy,
+                compat={
+                    "openclawConfigDir": f"/var/lib/clawloops/{user_id}/openclaw-config",
+                    "openclawWorkspaceDir": f"/var/lib/clawloops/{user_id}/workspace",
+                },
             )
             self._binding_service.patch_binding_state(
                 user_id=user_id,
@@ -264,10 +268,17 @@ class RuntimeManagerPortAdapter(RuntimeManagerPort):
     def stop(self, user_id: str, runtime_id: str) -> dict:
         return self._client.stop(user_id=user_id, runtime_id=runtime_id)
 
-    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+    def delete(
+        self,
+        user_id: str,
+        runtime_id: str,
+        retention_policy: str,
+        compat: dict[str, str] | None = None,
+    ) -> dict:
         return self._client.delete(
             user_id=user_id,
             runtime_id=runtime_id,
             retention_policy=retention_policy,
+            compat=compat,
         )
 

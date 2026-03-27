@@ -69,7 +69,13 @@ class RuntimeManagerPort(Protocol):
     def stop(self, user_id: str, runtime_id: str) -> dict:
         ...
 
-    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+    def delete(
+        self,
+        user_id: str,
+        runtime_id: str,
+        retention_policy: str,
+        compat: dict[str, str] | None = None,
+    ) -> dict:
         ...
 
 

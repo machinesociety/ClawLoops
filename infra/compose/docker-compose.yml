@@ -96,6 +96,20 @@ services:
       - prewarm
     image: "ghcr.io/berriai/litellm:v1.81.3-stable"
 
+  litellm:
+    image: "ghcr.io/berriai/litellm:v1.81.3-stable"
+    container_name: crewclaw-litellm
+    restart: unless-stopped
+    command:
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "4000"
+    environment:
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-sk-local-master}
+    networks:
+      - clawloops_shared
+
 networks:
   clawloops_shared:
     name: clawloops_shared

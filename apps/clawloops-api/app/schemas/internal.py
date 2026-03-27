@@ -41,14 +41,14 @@ class UsageRecordItem(BaseModel):
     totalTokens: int
 
 
-class ConfigMount(BaseModel):
-    configFilePath: str
-    secretFilePath: str
-
-
 class CompatConfig(BaseModel):
     openclawConfigDir: str
     openclawWorkspaceDir: str
+
+
+class RenderedConfig(BaseModel):
+    configVersion: str
+    openclawJson: dict
 
 
 class EnsureContainerRequest(BaseModel):
@@ -56,11 +56,9 @@ class EnsureContainerRequest(BaseModel):
     runtimeId: str
     volumeId: str
     routeHost: str
-    configMount: ConfigMount | None = None
     retentionPolicy: str
     compat: CompatConfig
-    env: dict[str, str] | None = None
-    envOverrides: dict[str, str] | None = None
+    renderedConfig: RenderedConfig
 
 
 class StopContainerRequest(BaseModel):
@@ -72,6 +70,7 @@ class DeleteContainerRequest(BaseModel):
     userId: str
     runtimeId: str
     retentionPolicy: str
+    compat: CompatConfig | None = None
 
 
 class ContainerStateResponse(BaseModel):

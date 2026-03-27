@@ -37,7 +37,7 @@ class RuntimeExecutor:
         host_port = bindings[0].get("HostPort")
         if not host_port:
             return None
-        return f"http://localhost:{host_port}"
+        return f"http://{self._settings.runtime_public_host}:{host_port}"
 
     def _list_managed(self, runtime_id: str):
         return self._docker.containers.list(

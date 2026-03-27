@@ -75,6 +75,7 @@ services:
       - PYTHONUNBUFFERED=1
       - RUNTIME_MANAGER_HOST=0.0.0.0
       - RUNTIME_MANAGER_PORT=18080
+      - RUNTIME_PUBLIC_HOST=${RUNTIME_PUBLIC_HOST:-localhost}
       - RUNTIME_OPENCLAW_NETWORK=clawloops_shared
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

@@ -1,19 +1,19 @@
 http:
   routers:
     clawloops_web:
-      rule: "Host(`clawloops.localhost`)"
+      rule: "Host(`clawloops.192.168.0.99.nip.io`) || Host(`192.168.0.99`)"
       entryPoints:
         - web
       service: clawloops_web
 
     clawloops_api:
-      rule: "Host(`clawloops.localhost`) && PathPrefix(`/api`)"
+      rule: "(Host(`clawloops.192.168.0.99.nip.io`) || Host(`192.168.0.99`)) && PathPrefix(`/api`)"
       entryPoints:
         - web
       service: clawloops_api
 
     runtime_manager:
-      rule: "Host(`runtime-manager.clawloops.localhost`)"
+      rule: "Host(`runtime-manager.192.168.0.99.nip.io`)"
       entryPoints:
         - web
       service: runtime_manager

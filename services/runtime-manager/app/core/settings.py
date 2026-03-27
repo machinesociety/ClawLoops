@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     runtime_manager_host: str = "0.0.0.0"
     runtime_manager_port: int = 18080
+    runtime_public_host: str = "localhost"
     runtime_openclaw_network: str = "clawloops_shared"
     runtime_openclaw_image_ref: str = (
         "ghcr.io/openclaw/openclaw@sha256:a5a4c83b773aca85a8ba99cf155f09afa33946c0aa5cc6a9ccb6162738b5da02"

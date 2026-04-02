@@ -71,7 +71,7 @@ docker compose logs -f
 
 ## 5. 访问方式
 
-- 主站：`http://<CLAWLOOPS_DOMAIN>`（默认 `http://clawloops.localhost`）
+- 主站：`http://<CLAWLOOPS_DOMAIN>`（默认 `http://clawloops.localhost`或 `http://192.168.0.103`）
 - API：`http://<CLAWLOOPS_DOMAIN>/api/...`
 - Runtime Manager：`http://<RUNTIME_MANAGER_DOMAIN>`
 - Traefik 仪表板：`http://127.0.0.1:8080`（当前配置为 insecure dashboard）

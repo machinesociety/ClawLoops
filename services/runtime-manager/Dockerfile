@@ -7,7 +7,11 @@ WORKDIR /app
 
 COPY services/runtime-manager/pyproject.toml /app/pyproject.toml
 COPY services/runtime-manager/app /app/app
-RUN pip install --no-cache-dir .
+# RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install --no-cache-dir \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    --trusted-host pypi.tuna.tsinghua.edu.cn \
+    .
 
 EXPOSE 18080
 

@@ -79,6 +79,7 @@ class FakeRuntimeManagerPort:
             "runtimeId": payload["runtimeId"],
             "observedState": "creating",
             "internalEndpoint": "http://clawloops-u001:3000",
+            "browserUrl": "http://127.0.0.1:18789", # 新增本地测试
             "message": "creating",
         }
 
@@ -86,10 +87,11 @@ class FakeRuntimeManagerPort:
         _ = user_id
         return {"status": "accepted"}
 
-    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+    def delete(self,user_id: str,runtime_id: str,retention_policy: str,compat: dict | None = None,) -> dict:
         _ = user_id
         _ = runtime_id
         _ = retention_policy
+        _ = compat # 新增
         return {"status": "accepted"}
 
 
@@ -98,7 +100,9 @@ def _make_fake_runtime_service() -> tuple[RuntimeService, FakeBindingPort, FakeR
     model_port = FakeModelConfigPort()
     runtime_manager = FakeRuntimeManagerPort()
     task_repo = InMemoryRuntimeTaskRepository()
-    renderer = RuntimeConfigRenderer(base_dir="/tmp/clawloops-int-tests")
+    # 注释掉 base_dir，因为测试环境没有挂载文件系统
+    # renderer = RuntimeConfigRenderer(base_dir="/tmp/clawloops-int-tests")
+    renderer = RuntimeConfigRenderer(litellm_api_key="sk-test")
     svc = RuntimeService(
         binding_service=binding_port,
         model_config_service=model_port,
@@ -149,9 +153,14 @@ def test_half_main_flow_login_sync_ensure_start_and_query_task(client, app):
         assert "compat" in payload
         assert payload["compat"]["openclawConfigDir"]
         assert payload["compat"]["openclawWorkspaceDir"]
-        assert "configMount" in payload
-        assert "configFilePath" in payload["configMount"]
-        assert "secretFilePath" in payload["configMount"]
+        
+        # assert "configMount" in payload
+        # assert "configFilePath" in payload["configMount"]
+        # assert "secretFilePath" in payload["configMount"]
+        
+        assert "renderedConfig" in payload
+        assert payload["renderedConfig"]["configVersion"]
+        assert payload["renderedConfig"]["openclawJson"]
 
         # binding 状态被回写
         assert binding_port.binding is not None

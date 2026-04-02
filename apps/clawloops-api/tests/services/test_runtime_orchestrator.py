@@ -75,6 +75,7 @@ class FakeRuntimeManagerPort:
             "runtimeId": payload["runtimeId"],
             "observedState": "creating",
             "internalEndpoint": "http://clawloops-u001:3000",
+            "browserUrl": "http://127.0.0.1:18789", #新增本地测试
             "message": "creating",
         }
 
@@ -84,8 +85,10 @@ class FakeRuntimeManagerPort:
             raise RuntimeError("stop error")
         return {"status": "accepted"}
 
-    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+    # def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str,compat: dict | None = None) -> dict:
         self.delete_calls.append((user_id, runtime_id, retention_policy))
+        _ = compat # 新增
         if self.should_fail:
             raise RuntimeError("delete error")
         return {"status": "accepted"}
@@ -96,7 +99,8 @@ def _make_service() -> tuple[RuntimeService, FakeBindingPort, FakeRuntimeManager
     model_port = FakeModelConfigPort()
     runtime_manager = FakeRuntimeManagerPort()
     task_repo = InMemoryRuntimeTaskRepository()
-    renderer = RuntimeConfigRenderer(base_dir="/tmp/clawloops-tests")
+    # renderer = RuntimeConfigRenderer(base_dir="/tmp/clawloops-tests")
+    renderer = RuntimeConfigRenderer(litellm_api_key="sk-test")
     svc = RuntimeService(
         binding_service=binding_port,
         model_config_service=model_port,
@@ -157,9 +161,16 @@ def test_ensure_running_creates_binding_and_calls_runtime_manager(tmp_path):
     assert len(runtime_manager.ensure_payloads) == 1
     payload = runtime_manager.ensure_payloads[0]
     assert payload["runtimeId"] == binding_port.binding.runtimeId
-    assert "configMount" in payload
-    assert "configFilePath" in payload["configMount"]
-    assert "secretFilePath" in payload["configMount"]
+    
+    # assert "configMount" in payload
+    # assert "configFilePath" in payload["configMount"]
+    # assert "secretFilePath" in payload["configMount"]
+
+    assert "renderedConfig" in payload
+    assert payload["renderedConfig"]["configVersion"]
+    assert payload["renderedConfig"]["openclawJson"]
+
+
     assert "compat" in payload
     assert payload["compat"]["openclawConfigDir"]
     assert payload["compat"]["openclawWorkspaceDir"]

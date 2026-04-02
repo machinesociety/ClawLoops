@@ -8,4 +8,5 @@ clawloops_backend.egg-info/requires.txt
 clawloops_backend.egg-info/top_level.txt
 tests/test_contracts_runtime_binding.py
 tests/test_contracts_v08_baseline.py
+tests/test_contracts_v12_lightweight_auth.py
 tests/test_healthcheck.py

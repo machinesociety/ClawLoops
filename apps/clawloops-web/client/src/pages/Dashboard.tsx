@@ -203,7 +203,8 @@ function RuntimeCard({
   const canStart = !isActionInProgress && (uiState === 'runtimeStopped' || uiState === 'runtimeUnknown' || uiState === 'runtimeError');
   const canStop = !isActionInProgress && uiState === 'runtimeRunning';
   const canDelete = !isActionInProgress && (uiState === 'runtimeStopped' || uiState === 'runtimeError' || uiState === 'runtimeRunning');
-  const canOpen = !isActionInProgress && status?.ready === true;
+  // const canOpen = !isActionInProgress && status?.ready === true;
+  const canOpen = !isActionInProgress && !!status?.runtimeId;
 
   return (
     <Card className="card-glow">
@@ -621,7 +622,8 @@ function DashboardContent() {
     try {
       const entry = await workspaceApi.entry();
       if (entry.ready && entry.browserUrl) {
-        window.open(entry.browserUrl, '_blank');
+        // window.location.href = entry.browserUrl;
+        window.location.href = '/api/v1/workspace-entry/redirect';
       } else {
         navigate('/workspace-entry');
       }

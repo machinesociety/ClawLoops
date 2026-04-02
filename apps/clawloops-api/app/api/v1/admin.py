@@ -30,6 +30,7 @@ from app.repositories.model_repository import (
 from app.schemas.admin import (
     AdminUsageSummaryResponse,
     AdminUserDetailResponse,
+    AdminUserListResponse,
     AdminUserListItem,
     AdminUserRuntimeResponse,
     UpdateUserStatusRequest,
@@ -212,30 +213,29 @@ async def get_admin_home(
     )
 
 
-@router.get("/admin/users", response_model=list[AdminUserListItem])
+@router.get("/admin/users", response_model=AdminUserListResponse)
 async def list_users(
     _: AuthContext = Depends(_require_admin),
     user_service: UserService = Depends(get_user_service),
-) -> list[AdminUserListItem]:
-    repo = user_service._user_repo  # type: ignore[attr-defined]
-    users = []
-    if hasattr(repo, "_users"):
-        users = list(repo._users.values())  # type: ignore[attr-defined]
-
-    return [
-        AdminUserListItem(
-            userId=u.user_id,
-            subjectId=u.subject_id,
-            role=u.role.value,
-            status=u.status.value,
-            runtimeObservedState=(
-                user_service.get_runtime_binding(u.user_id).observed_state.value
-                if user_service.get_runtime_binding(u.user_id) is not None
-                else None
-            ),
+) -> AdminUserListResponse:
+    users = user_service.list_users()
+    items: list[AdminUserListItem] = []
+    for u in users:
+        binding = user_service.get_runtime_binding(u.user_id)
+        items.append(
+            AdminUserListItem(
+                userId=u.user_id,
+                subjectId=u.subject_id,
+                role=u.role.value,
+                status=u.status.value,
+                authMethod="local_password",
+                runtimeObservedState=binding.observed_state.value if binding else None,
+                lastLoginAt=u.last_login_at.isoformat() if u.last_login_at else None,
+                username=u.username,
+                email=None,
+            )
         )
-        for u in users
-    ]
+    return AdminUserListResponse(users=items)
 
 
 @router.get("/admin/users/{user_id}", response_model=AdminUserDetailResponse)
@@ -248,12 +248,19 @@ async def get_admin_user_detail(
     if user is None:
         raise UserNotFoundError()
 
+    binding = user_service.get_runtime_binding(user_id)
     return AdminUserDetailResponse(
         userId=user.user_id,
         subjectId=user.subject_id,
         tenantId=user.tenant_id,
         role=user.role.value,
         status=user.status.value,
+        authMethod="local_password",
+        runtimeObservedState=binding.observed_state.value if binding else None,
+        lastLoginAt=user.last_login_at.isoformat() if user.last_login_at else None,
+        username=user.username,
+        email=None,
+        createdAt=user.created_at.isoformat() if user.created_at else None,
     )
 
 
@@ -507,5 +514,3 @@ async def resend_admin_invitation(
     # Keep endpoint available for frontend interaction contract.
     _ = repo
     return {"ok": True, "invitationId": invitation_id}
-
-

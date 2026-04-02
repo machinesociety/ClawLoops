@@ -192,15 +192,14 @@ def get_runtime_service(
         )
 
     def get_model_config(user_id: str) -> ModelConfigResponse:
-        _ = user_id
         model_base_url = settings.model_gateway_base_url or "http://litellm:4000"
-        model_ids = settings.get_model_gateway_default_models()
-        return ModelConfigResponse(
-            baseUrl=model_base_url,
-            models=model_ids,
-            gatewayAccessTokenRef="token_ref_001",
-            configRenderVersion="v1",
-        )
+        preferred_models = settings.get_model_gateway_default_models()
+
+        from app.infra.model_gateway_client import ModelGatewayClient
+
+        client = ModelGatewayClient(model_base_url)
+        payload = client.get_user_model_config(user_id=user_id, preferred_models=preferred_models)
+        return ModelConfigResponse(**payload)
 
     binding_port = UserRuntimeBindingServiceAdapter(
         ensure_binding_fn=ensure_binding_schema,
@@ -222,5 +221,4 @@ def get_runtime_service(
         config_renderer=renderer,
         route_host_suffix=settings.route_host_suffix,
     )
-
 

@@ -66,7 +66,7 @@ class RuntimeConfigRenderer:
                         ],
                     }
                 },
-                "mode": "merge",
+                "mode": "replace",
             },
             "agents": {
                 "defaults": {
@@ -80,4 +80,3 @@ class RuntimeConfigRenderer:
             },
         }
         return openclaw_json, model_config.config_render_version
-

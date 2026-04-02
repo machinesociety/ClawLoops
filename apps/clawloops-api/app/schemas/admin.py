@@ -22,8 +22,15 @@ class AdminUserListItem(BaseModel):
     subjectId: str
     role: str
     status: str
+    authMethod: str
     runtimeObservedState: str | None = None
     lastLoginAt: str | None = None
+    username: str | None = None
+    email: str | None = None
+
+
+class AdminUserListResponse(BaseModel):
+    users: list[AdminUserListItem]
 
 
 class AdminUserDetailResponse(BaseModel):
@@ -32,6 +39,11 @@ class AdminUserDetailResponse(BaseModel):
     tenantId: str
     role: str
     status: str
+    authMethod: str
+    runtimeObservedState: str | None = None
+    lastLoginAt: str | None = None
+    username: str | None = None
+    email: str | None = None
     createdAt: str | None = None
     updatedAt: str | None = None
 
@@ -39,4 +51,3 @@ class AdminUserDetailResponse(BaseModel):
 class AdminUsageSummaryResponse(BaseModel):
     totalTokens: int
     usedTokens: int
-

@@ -56,6 +56,9 @@ class UserService:
 
         return self._user_repo.get_by_id(user_id)
 
+    def list_users(self) -> list[User]:
+        return self._user_repo.list_users()
+
     def set_user_status(self, user_id: str, status: UserStatus) -> User:
         """
         更新用户状态（例如 active/disabled），并持久化。
@@ -148,4 +151,3 @@ class UserService:
         binding.last_error = last_error
         self._binding_repo.save(binding)
         return binding
-

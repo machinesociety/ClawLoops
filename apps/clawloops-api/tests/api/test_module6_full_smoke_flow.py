@@ -84,10 +84,11 @@ class _FakeRuntimeManagerPort:
         _ = user_id
         return {"status": "accepted"}
 
-    def delete(self, user_id: str, runtime_id: str, retention_policy: str) -> dict:
+    def delete(self, user_id: str, runtime_id: str, retention_policy: str,compat: dict | None = None) -> dict:
         _ = user_id
         _ = runtime_id
         _ = retention_policy
+        _ = compat # 新增
         return {"status": "accepted"}
 
 
@@ -96,7 +97,9 @@ def _make_fake_runtime_service() -> RuntimeService:
     model_port = _FakeModelConfigPort()
     runtime_manager = _FakeRuntimeManagerPort()
     task_repo = InMemoryRuntimeTaskRepository()
-    renderer = RuntimeConfigRenderer(base_dir="/tmp/clawloops-int-tests")
+    # 注释掉 base_dir，因为测试环境没有挂载文件系统
+    # renderer = RuntimeConfigRenderer(base_dir="/tmp/clawloops-int-tests")
+    renderer = RuntimeConfigRenderer(litellm_api_key="sk-test")
     return RuntimeService(
         binding_service=binding_port,
         model_config_service=model_port,

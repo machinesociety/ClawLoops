@@ -35,6 +35,9 @@ class UserRepository(ABC):
     @abstractmethod
     def save(self, user: User) -> None: ...
 
+    @abstractmethod
+    def list_users(self) -> list[User]: ...
+
 
 class UserRuntimeBindingRepository(Protocol):
     """
@@ -68,6 +71,9 @@ class InMemoryUserRepository(UserRepository):
 
     def save(self, user: User) -> None:
         self._users[user.user_id] = user
+
+    def list_users(self) -> list[User]:
+        return list(self._users.values())
 
 
 class SqlAlchemyUserRepository(UserRepository):
@@ -142,6 +148,10 @@ class SqlAlchemyUserRepository(UserRepository):
             row.last_login_at = user.last_login_at
 
         self._session.commit()
+
+    def list_users(self) -> list[User]:
+        rows = self._session.query(UserModel).all()
+        return [self._to_domain(row) for row in rows]
 
     @staticmethod
     def _to_domain(row: UserModel) -> User:
@@ -225,5 +235,4 @@ class SqlAlchemyUserRuntimeBindingRepository(UserRuntimeBindingRepository):
             internal_endpoint=row.internal_endpoint,
             last_error=row.last_error,
         )
-
 

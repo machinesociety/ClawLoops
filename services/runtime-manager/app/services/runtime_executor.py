@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import shutil
 import socket
 import time
@@ -18,6 +19,10 @@ from app.schemas.contracts import (
 )
 from app.services.config_writer import prepare_runtime_dirs, write_openclaw_config
 from app.services.drift_detector import detect_drift
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class RuntimeExecutor:
@@ -75,6 +80,19 @@ class RuntimeExecutor:
         return False
 
     def _create_runtime_container(self, req: EnsureContainerRequest, labels: dict[str, str], alias: str):
+        # 先拉取镜像
+        try:
+            logger.info(f"Pulling image: {self._settings.runtime_openclaw_image_ref}")
+            self._docker.images.pull(self._settings.runtime_openclaw_image_ref)
+            logger.info("Image pulled successfully")
+        except Exception as e:
+            logger.error(f"Failed to pull image: {e}")
+            raise RuntimeManagerError(
+                "RUNTIME_START_FAILED",
+                f"failed to pull image: {str(e)}",
+                500,
+            ) from e
+        
         container = self._docker.containers.create(
             image=self._settings.runtime_openclaw_image_ref,
             command=self._settings.runtime_openclaw_command.split(" "),
@@ -101,8 +119,15 @@ class RuntimeExecutor:
 
     def ensure_running(self, req: EnsureContainerRequest) -> ContainerStateResponse:
         try:
+            logger.info(f"Starting ensure_running for runtime {req.runtimeId}")
+            logger.info(f"Config dir: {req.compat.openclawConfigDir}")
+            logger.info(f"Workspace dir: {req.compat.openclawWorkspaceDir}")
+            
             prepare_runtime_dirs(req.compat.openclawConfigDir, req.compat.openclawWorkspaceDir)
+            logger.info("Prepared runtime dirs")
+            
             write_openclaw_config(req.compat.openclawConfigDir, req.renderedConfig.openclawJson)
+            logger.info("Wrote openclaw config")
 
             def container_ip(c) -> str:
                 c.reload()
@@ -113,57 +138,19 @@ class RuntimeExecutor:
                     .get("IPAddress", "")
                 )
 
-            existing = self._get_single_container(req.runtimeId)
-            if existing is not None:
-                drifts = detect_drift(existing, req, self._settings)
-                if drifts:
-                    raise RuntimeManagerError(
-                        "RUNTIME_CONTRACT_DRIFT",
-                        "existing container contract drift detected",
-                        409,
-                    )
-                if existing.status != "running":
-                    existing.start()
-                    existing.reload()
-                    ip = container_ip(existing)
-                    if existing.status == "running" and ip and not self._wait_ready(ip, 18789):
-                        raise RuntimeManagerError(
-                            "RUNTIME_START_FAILED",
-                            "failed to prepare config or start container",
-                            500,
-                        )
-                endpoint = self._internal_endpoint(req.runtimeId)
-                browser_url = self._browser_url_from_container(existing)
-                # Legacy runtimes created before host-port mapping rollout are auto-migrated once.
-                if browser_url is None:
-                    existing.remove(force=True)
-                    labels = {
-                        "clawloops.managed": "true",
-                        "clawloops.userId": req.userId,
-                        "clawloops.runtimeId": req.runtimeId,
-                        "clawloops.volumeId": req.volumeId,
-                        "clawloops.routeHost": req.routeHost,
-                        "clawloops.retentionPolicy": req.retentionPolicy,
-                        "clawloops.configVersion": req.renderedConfig.configVersion,
-                    }
-                    alias = f"rt-{req.runtimeId}"
-                    migrated = self._create_runtime_container(req, labels, alias)
-                    ip = container_ip(migrated)
-                    if not ip or not self._wait_ready(ip, 18789):
-                        raise RuntimeManagerError(
-                            "RUNTIME_START_FAILED",
-                            "failed to prepare config or start container",
-                            500,
-                        )
-                    browser_url = self._browser_url_from_container(migrated)
-                return ContainerStateResponse(
-                    runtimeId=req.runtimeId,
-                    observedState="running" if existing.status == "running" else "creating",
-                    internalEndpoint=endpoint,
-                    browserUrl=browser_url,
-                    message="already running" if existing.status == "running" else "creating",
-                )
+            # 清理现有的容器，避免冲突
+            existing_containers = self._list_managed(req.runtimeId)
+            if existing_containers:
+                logger.info(f"Found {len(existing_containers)} existing containers for runtime {req.runtimeId}, removing them")
+                for container in existing_containers:
+                    try:
+                        container.remove(force=True)
+                        logger.info(f"Removed existing container: {container.id}")
+                    except Exception as e:
+                        logger.error(f"Failed to remove container {container.id}: {e}")
 
+            # 创建新容器
+            logger.info("Creating new container")
             labels = {
                 "clawloops.managed": "true",
                 "clawloops.userId": req.userId,
@@ -176,17 +163,38 @@ class RuntimeExecutor:
             alias = f"rt-{req.runtimeId}"
             container = self._create_runtime_container(req, labels, alias)
             container.reload()
+            logger.info(f"Created container with status: {container.status}")
+            
             if container.status != "running":
+                logger.error(f"Container is not running, status: {container.status}")
+                # 清理失败的容器
+                try:
+                    container.remove(force=True)
+                    logger.info(f"Removed failed container: {container.id}")
+                except Exception as e:
+                    logger.error(f"Failed to remove failed container {container.id}: {e}")
                 raise RuntimeManagerError("RUNTIME_START_FAILED", "container is not running", 500)
 
             ip = container_ip(container)
+            logger.info(f"New container IP: {ip}")
+            
             if not ip or not self._wait_ready(ip, 18789):
+                logger.error("Failed to wait for new container to be ready")
+                # 清理失败的容器
+                try:
+                    container.remove(force=True)
+                    logger.info(f"Removed failed container: {container.id}")
+                except Exception as e:
+                    logger.error(f"Failed to remove failed container {container.id}: {e}")
                 raise RuntimeManagerError(
                     "RUNTIME_START_FAILED",
                     "failed to prepare config or start container",
                     500,
                 )
+            
             browser_url = self._browser_url_from_container(container)
+            logger.info(f"New container browser URL: {browser_url}")
+            
             return ContainerStateResponse(
                 runtimeId=req.runtimeId,
                 observedState="running",
@@ -195,11 +203,13 @@ class RuntimeExecutor:
                 message="creating",
             )
         except RuntimeManagerError:
+            logger.exception("RuntimeManagerError occurred")
             raise
         except (APIError, OSError, ValueError) as exc:
+            logger.exception(f"Exception occurred: {exc}")
             raise RuntimeManagerError(
                 "RUNTIME_START_FAILED",
-                "failed to prepare config or start container",
+                f"failed to prepare config or start container: {str(exc)}",
                 500,
             ) from exc
 

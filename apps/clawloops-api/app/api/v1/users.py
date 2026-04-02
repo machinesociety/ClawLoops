@@ -13,11 +13,34 @@ from app.schemas.runtime import (
     UserRuntimeBinding,
     UserRuntimeBindingResponse,
 )
+from app.schemas.users import UserResponse
 from app.services.openclaw_url import merge_with_existing_token
 from app.services.user_service import UserService
 
 
 router = APIRouter(tags=["users"])
+
+
+@router.get("/users/me", response_model=UserResponse)
+async def get_current_user(
+    ctx = Depends(require_active_user),
+    user_service: UserService = Depends(get_user_service),
+) -> UserResponse:
+    """
+    获取当前用户信息。
+    """
+    user = user_service.get_user_by_id(ctx.userId)
+    if user is None:
+        from app.core.errors import UserNotFoundError
+        raise UserNotFoundError()
+    return UserResponse(
+        userId=user.user_id,
+        subjectId=user.subject_id,
+        username=user.username,
+        tenantId=user.tenant_id,
+        role=user.role.value,
+        status=user.status.value,
+    )
 
 
 @router.get("/users/me/quota", response_model=UserQuotaResponse)

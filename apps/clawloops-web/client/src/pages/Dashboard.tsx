@@ -622,8 +622,7 @@ function DashboardContent() {
     try {
       const entry = await workspaceApi.entry();
       if (entry.ready && entry.browserUrl) {
-        // window.location.href = entry.browserUrl;
-        window.location.href = '/api/v1/workspace-entry/redirect';
+        window.open('/api/v1/workspace-entry/redirect', '_blank');
       } else {
         navigate('/workspace-entry');
       }

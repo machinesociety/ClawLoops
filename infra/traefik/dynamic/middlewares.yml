@@ -12,6 +12,18 @@ http:
         - web
       service: clawloops_api
 
+    clawloops_healthz:
+      rule: "(Host(`clawloops.192.168.0.103.nip.io`) || Host(`192.168.0.103`)) && Path(`/healthz`)"
+      entryPoints:
+        - web
+      service: clawloops_api
+
+    clawloops_public:
+      rule: "(Host(`clawloops.192.168.0.103.nip.io`) || Host(`192.168.0.103`)) && PathPrefix(`/public`)"
+      entryPoints:
+        - web
+      service: clawloops_api
+
     runtime_manager:
       rule: "Host(`runtime-manager.192.168.0.103.nip.io`)"
       entryPoints:
@@ -31,3 +43,23 @@ http:
       loadBalancer:
         servers:
           - url: "http://runtime-manager:18080"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

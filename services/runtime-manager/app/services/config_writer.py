@@ -8,36 +8,48 @@ from pathlib import Path
 from app.core.errors import RuntimeManagerError
 
 
+# Check if running on Windows
+IS_WINDOWS = os.name == 'nt'
+
+
 def _prepare_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
-    try:
-        os.chown(path, 1000, 1000)
-    except PermissionError as exc:
-        raise RuntimeManagerError("RUNTIME_START_FAILED", f"chown failed for {path}", 500) from exc
+    # Skip chown on Windows
+    if not IS_WINDOWS:
+        try:
+            os.chown(path, 1000, 1000)
+        except PermissionError as exc:
+            raise RuntimeManagerError("RUNTIME_START_FAILED", f"chown failed for {path}", 500) from exc
     path.chmod(0o775)
 
 
 def _apply_recursive_permissions(root: Path) -> None:
     for current_root, dirs, files in os.walk(root):
         root_path = Path(current_root)
-        try:
-            os.chown(root_path, 1000, 1000)
-        except PermissionError as exc:
-            raise RuntimeManagerError("RUNTIME_START_FAILED", f"chown failed for {root_path}", 500) from exc
+        # Skip chown on Windows
+        if not IS_WINDOWS:
+            try:
+                os.chown(root_path, 1000, 1000)
+            except PermissionError as exc:
+                raise RuntimeManagerError("RUNTIME_START_FAILED", f"chown failed for {root_path}", 500) from exc
         root_path.chmod(0o775)
         for name in dirs:
             p = root_path / name
-            try:
-                os.chown(p, 1000, 1000)
-            except PermissionError as exc:
-                raise RuntimeManagerError("RUNTIME_START_FAILED", f"chown failed for {p}", 500) from exc
+            # Skip chown on Windows
+            if not IS_WINDOWS:
+                try:
+                    os.chown(p, 1000, 1000)
+                except PermissionError as exc:
+                    raise RuntimeManagerError("RUNTIME_START_FAILED", f"chown failed for {p}", 500) from exc
             p.chmod(0o775)
         for name in files:
             p = root_path / name
-            try:
-                os.chown(p, 1000, 1000)
-            except PermissionError as exc:
-                raise RuntimeManagerError("RUNTIME_START_FAILED", f"chown failed for {p}", 500) from exc
+            # Skip chown on Windows
+            if not IS_WINDOWS:
+                try:
+                    os.chown(p, 1000, 1000)
+                except PermissionError as exc:
+                    raise RuntimeManagerError("RUNTIME_START_FAILED", f"chown failed for {p}", 500) from exc
             p.chmod(0o664)
 
 
@@ -63,7 +75,9 @@ def write_openclaw_config(config_dir: str, openclaw_json: dict) -> str:
             f.flush()
             os.fsync(f.fileno())
         os.replace(temp_path, target)
-        os.chown(target, 1000, 1000)
+        # Skip chown on Windows
+        if not IS_WINDOWS:
+            os.chown(target, 1000, 1000)
         os.chmod(target, 0o664)
     finally:
         if os.path.exists(temp_path):

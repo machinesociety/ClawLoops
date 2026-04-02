@@ -104,7 +104,7 @@ function WorkspaceEntryContent() {
 
       if (data.ready && data.browserUrl) {
         setPageState('readyToRedirect');
-        window.location.href = '/api/v1/workspace-entry/redirect';
+        window.open('/api/v1/workspace-entry/redirect', '_blank');
         return true;
       }
 

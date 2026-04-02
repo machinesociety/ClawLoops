@@ -83,13 +83,15 @@ async def preview_invitation(
 ) -> InvitationPreviewResponse:
     record = _resolve_invitation_record(repo, token)
     if record is None:
-        return InvitationPreviewResponse(valid=False, invitation=None)
+        raise InvitationNotFoundError()
 
     now = datetime.now(timezone.utc)
-    if record.status != "pending":
-        return InvitationPreviewResponse(valid=False, invitation=None)
+    if record.status == "revoked":
+        raise InvitationRevokedError()
+    if record.status == "consumed":
+        raise InvitationAlreadyConsumedError()
     if record.expires_at.replace(tzinfo=timezone.utc) < now:
-        return InvitationPreviewResponse(valid=False, invitation=None)
+        raise InvitationExpiredError()
 
     return InvitationPreviewResponse(
         valid=True,

@@ -110,7 +110,7 @@ def test_admin_can_list_and_get_user_detail(client, issue_session_cookie):
         issue_session_cookie(client, user_id="u_admin")
         resp = client.get("/api/v1/admin/users")
         assert resp.status_code == status.HTTP_200_OK
-        users = resp.json()
+        users = resp.json()["users"]
         assert any(u["userId"] == "u_user" for u in users)
         assert any(u["runtimeObservedState"] == "running" for u in users if u["userId"] == "u_user")
 
@@ -257,5 +257,4 @@ def test_admin_can_manage_models_provider_credentials_and_usage(client, issue_se
         assert delete_resp.status_code == status.HTTP_204_NO_CONTENT
     finally:
         client.app.dependency_overrides.clear()
-
 

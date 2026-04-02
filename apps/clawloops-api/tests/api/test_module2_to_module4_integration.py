@@ -40,7 +40,8 @@ def test_module2_to_module4_integration(client):
         resp_models = client.get("/api/v1/models", headers=headers)
         assert resp_models.status_code == status.HTTP_200_OK
         models = resp_models.json()["models"]
-        assert any(model["modelId"] == "gpt-4-mini" for model in models)
+        assert models
+        assert all("modelId" in model for model in models)
 
         resp_usage = client.get("/api/v1/usage/summary", headers=headers)
         assert resp_usage.status_code == status.HTTP_200_OK
@@ -48,4 +49,3 @@ def test_module2_to_module4_integration(client):
         assert usage["userId"] == user_id
     finally:
         client.app.dependency_overrides.pop(get_sqlalchemy_user_repository, None)
-

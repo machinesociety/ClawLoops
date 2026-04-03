@@ -111,13 +111,15 @@ function AdminUsageContent() {
     loadSummary();
   }, [loadSummary]);
 
+  // Fixed: Display 0 when value is undefined or null
   function formatNumber(n?: number) {
-    if (n === undefined || n === null) return '—';
+    if (n === undefined || n === null) return '0';
     return n.toLocaleString('zh-CN');
   }
 
+  // Fixed: Display $0.0000 when value is undefined or null
   function formatCost(n?: number) {
-    if (n === undefined || n === null) return '—';
+    if (n === undefined || n === null) return '$0.0000';
     return `$${n.toFixed(4)}`;
   }
 

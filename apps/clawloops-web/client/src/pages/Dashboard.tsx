@@ -284,7 +284,7 @@ function RuntimeCard({
                 ) : (
                   <Play className="w-3.5 h-3.5" />
                 )}
-                启动
+                {actionInProgress === 'start' ? '正在启动' : '启动'}
               </Button>
               <Button
                 size="sm"
@@ -298,7 +298,7 @@ function RuntimeCard({
                 ) : (
                   <Square className="w-3.5 h-3.5" />
                 )}
-                停止
+                {actionInProgress === 'stop' ? '正在停止' : '停止'}
               </Button>
               <Button
                 size="sm"
@@ -573,6 +573,7 @@ function DashboardContent() {
   // ============================================================
 
   const handleStart = async () => {
+    setActionInProgress('start');
     try {
       const res = await runtimeApi.start();
       toast.success('启动任务已提交');
@@ -583,10 +584,12 @@ function DashboardContent() {
       } else {
         toast.error('启动失败');
       }
+      setActionInProgress(null);
     }
   };
 
   const handleStop = async () => {
+    setActionInProgress('stop');
     try {
       const res = await runtimeApi.stop();
       toast.success('停止任务已提交');
@@ -597,6 +600,7 @@ function DashboardContent() {
       } else {
         toast.error('停止失败');
       }
+      setActionInProgress(null);
     }
   };
 

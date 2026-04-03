@@ -48,6 +48,27 @@ class AdminUserDetailResponse(BaseModel):
     updatedAt: str | None = None
 
 
+class AdminUsagePeriod(BaseModel):
+    from_: str
+    to: str
+
+class AdminUsageByModel(BaseModel):
+    modelId: str
+    modelName: str | None = None
+    requests: int
+    tokens: int
+    cost: float | None = None
+
+class AdminUsageByUser(BaseModel):
+    userId: str
+    requests: int
+    tokens: int
+    cost: float | None = None
+
 class AdminUsageSummaryResponse(BaseModel):
+    totalRequests: int
     totalTokens: int
-    usedTokens: int
+    totalCost: float
+    byModel: list[AdminUsageByModel]
+    byUser: list[AdminUsageByUser]
+    period: AdminUsagePeriod
